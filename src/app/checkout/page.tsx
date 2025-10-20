@@ -21,13 +21,13 @@ interface ExtendedCheckoutInfo extends Omit<CheckoutInfo, "paymentMethod"> {
 }
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return price.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 const Checkout = () => {
   const { items, getTotal, clearCart } = useCartStore()
   const subtotal = getTotal()
-  const [deliveryFee, setDeliveryFee] = useState<number>(59.00)
+  const [deliveryFee, setDeliveryFee] = useState<number>(59.0)
   const [isCalculatingFee, setIsCalculatingFee] = useState(false)
   const total = subtotal + deliveryFee
   const [isProcessing, setIsProcessing] = useState(false)
@@ -76,7 +76,6 @@ const Checkout = () => {
               zipCode: parsedUserData.zip_code || "",
             }))
 
-            // Calculate delivery fee if city is available
             if (parsedUserData.city) {
               calculateDeliveryFee(parsedUserData.city)
             }
@@ -103,7 +102,7 @@ const Checkout = () => {
 
   const calculateDeliveryFee = async (city: string) => {
     if (!city || city.trim().length < 2) {
-      setDeliveryFee(59.00)
+      setDeliveryFee(59.0)
       return
     }
 
@@ -128,11 +127,11 @@ const Checkout = () => {
           description: `Delivery fee for ${city}: ₱${formatPrice(result.data.delivery_fee)}`,
         })
       } else {
-        setDeliveryFee(59.00)
+        setDeliveryFee(59.0)
       }
     } catch (error) {
       console.error("Error calculating delivery fee:", error)
-      setDeliveryFee(59.00)
+      setDeliveryFee(59.0)
     } finally {
       setIsCalculatingFee(false)
     }
@@ -141,7 +140,6 @@ const Checkout = () => {
   const handleInputChange = (field: keyof ExtendedCheckoutInfo, value: string) => {
     setCheckoutInfo((prev) => ({ ...prev, [field]: value }))
 
-    // Calculate delivery fee when city changes
     if (field === "city" && value.trim().length >= 2) {
       const timeoutId = setTimeout(() => {
         calculateDeliveryFee(value)
@@ -266,10 +264,10 @@ const Checkout = () => {
 
   if (isLoadingUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-yellow-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-green-600/30 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-green-600">Loading checkout...</p>
+          <div className="w-8 h-8 border-2 border-orange-300 border-t-orange-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-orange-800">Loading checkout...</p>
         </div>
       </div>
     )
@@ -277,47 +275,47 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-green-100">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-green-400/30 to-emerald-500/30 rounded-full blur-xl animate-pulse mx-auto mb-4"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-emerald-400/25 to-green-400/25 rounded-full blur-lg animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-green-300/20 to-emerald-400/20 rounded-full blur-2xl animate-pulse delay-2000"></div>
-        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-emerald-300/30 to-green-300/30 rounded-full blur-xl animate-pulse delay-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-orange-100 to-yellow-50">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-yellow-300/40 to-orange-400/40 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-orange-300/35 to-yellow-300/35 rounded-full blur-lg animate-pulse delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-yellow-200/30 to-orange-300/30 rounded-full blur-2xl animate-pulse delay-2000"></div>
+        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-orange-200/40 to-yellow-200/40 rounded-full blur-xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative z-10 py-8">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              Checkout 🛒
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-800 bg-clip-text text-transparent">
+              Checkout
             </h1>
             {userInfo && (
-              <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-green-200">
-                <LogIn className="w-4 h-4 text-green-600" />
-                <span className="text-gray-700">Welcome, {userInfo.name}!</span>
+              <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 border border-orange-300 shadow-md">
+                <LogIn className="w-4 h-4 text-orange-600" />
+                <span className="text-orange-900 font-medium">Welcome, {userInfo.name}!</span>
               </div>
             )}
           </div>
 
           {!userInfo && (
-            <Card className="mb-8 bg-white/70 backdrop-blur-sm border-green-200 rounded-2xl">
+            <Card className="mb-8 bg-white/90 backdrop-blur-sm border-orange-300 rounded-2xl shadow-lg">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-green-600 mb-2">Login for faster checkout!</h3>
-                    <p className="text-gray-600">Save your information for quick ordering next time.</p>
+                    <h3 className="text-lg font-semibold text-orange-700 mb-2">Login for faster checkout!</h3>
+                    <p className="text-orange-600">Save your information for quick ordering next time.</p>
                   </div>
                   <div className="flex gap-2">
                     <Link href="/login">
                       <Button
                         variant="outline"
-                        className="border-green-300 text-green-600 hover:bg-green-50 bg-transparent"
+                        className="border-orange-400 text-orange-700 hover:bg-orange-50 bg-white"
                       >
                         <LogIn className="w-4 h-4 mr-2" />
                         Login
                       </Button>
                     </Link>
                     <Link href="/register">
-                      <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white">
+                      <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-bold shadow-md">
                         <LogIn className="w-4 h-4 mr-2" />
                         Register
                       </Button>
@@ -329,20 +327,20 @@ const Checkout = () => {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="bg-white/70 backdrop-blur-md border-green-200 shadow-2xl rounded-2xl">
-              <CardHeader className="border-b border-green-200 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-t-2xl !p-4">
+            <Card className="bg-white/95 backdrop-blur-md border-orange-300 shadow-2xl rounded-2xl">
+              <CardHeader className="border-b border-orange-200 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-t-2xl !p-4">
                 <CardTitle className="text-xl">Delivery & Payment Information</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-lg text-green-600 border-b border-green-300 pb-2">
+                    <h3 className="font-semibold text-lg text-orange-700 border-b border-orange-200 pb-2">
                       Personal Information
                     </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="name" className="text-gray-700">
+                        <Label htmlFor="name" className="text-orange-800">
                           Full Name *
                         </Label>
                         <Input
@@ -351,11 +349,11 @@ const Checkout = () => {
                           onChange={(e) => handleInputChange("name", e.target.value)}
                           placeholder="Enter your full name"
                           required
-                          className="bg-white/70 border-green-300 text-gray-800 placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20"
+                          className="bg-white border-orange-300 text-orange-900 placeholder:text-orange-400 focus:border-orange-500 focus:ring-orange-500/20"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="email" className="text-gray-700">
+                        <Label htmlFor="email" className="text-orange-800">
                           Email Address *
                         </Label>
                         <Input
@@ -365,13 +363,13 @@ const Checkout = () => {
                           onChange={(e) => handleInputChange("email", e.target.value)}
                           placeholder="Enter your email"
                           required
-                          className="bg-white/70 border-green-300 text-gray-800 placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20"
+                          className="bg-white border-orange-300 text-orange-900 placeholder:text-orange-400 focus:border-orange-500 focus:ring-orange-500/20"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <Label htmlFor="phone" className="text-gray-700">
+                      <Label htmlFor="phone" className="text-orange-800">
                         Phone Number *
                       </Label>
                       <Input
@@ -381,20 +379,20 @@ const Checkout = () => {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         placeholder="Enter your phone number"
                         required
-                        className="bg-white/70 border-green-300 text-gray-800 placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20"
+                        className="bg-white border-orange-300 text-orange-900 placeholder:text-orange-400 focus:border-orange-500 focus:ring-orange-500/20"
                       />
                     </div>
                   </div>
 
-                  <Separator className="bg-green-300" />
+                  <Separator className="bg-orange-200" />
 
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-lg text-green-600 border-b border-green-300 pb-2">
+                    <h3 className="font-semibold text-lg text-orange-700 border-b border-orange-200 pb-2">
                       Delivery Address
                     </h3>
 
                     <div>
-                      <Label htmlFor="address" className="text-gray-700">
+                      <Label htmlFor="address" className="text-orange-800">
                         Street Address *
                       </Label>
                       <Input
@@ -403,14 +401,15 @@ const Checkout = () => {
                         onChange={(e) => handleInputChange("address", e.target.value)}
                         placeholder="Enter your street address"
                         required
-                        className="bg-white/70 border-green-300 text-gray-800 placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20"
+                        className="bg-white border-orange-300 text-orange-900 placeholder:text-orange-400 focus:border-orange-500 focus:ring-orange-500/20"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="city" className="text-gray-700">
-                          City * {isCalculatingFee && <span className="text-xs text-green-600">(Calculating fee...)</span>}
+                        <Label htmlFor="city" className="text-orange-800">
+                          City *{" "}
+                          {isCalculatingFee && <span className="text-xs text-orange-600">(Calculating fee...)</span>}
                         </Label>
                         <Input
                           id="city"
@@ -418,15 +417,15 @@ const Checkout = () => {
                           onChange={(e) => handleInputChange("city", e.target.value)}
                           placeholder="Enter your city"
                           required
-                          className="bg-white/70 border-green-300 text-gray-800 placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20"
+                          className="bg-white border-orange-300 text-orange-900 placeholder:text-orange-400 focus:border-orange-500 focus:ring-orange-500/20"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-orange-600 mt-1">
                           <TruckIcon className="w-3 h-3 inline mr-1" />
                           Delivery fee: ₱{formatPrice(deliveryFee)} (₱59 for first 5km, ₱10/km after)
                         </p>
                       </div>
                       <div>
-                        <Label htmlFor="zipCode" className="text-gray-700">
+                        <Label htmlFor="zipCode" className="text-orange-800">
                           ZIP Code *
                         </Label>
                         <Input
@@ -435,16 +434,16 @@ const Checkout = () => {
                           onChange={(e) => handleInputChange("zipCode", e.target.value)}
                           placeholder="Enter ZIP code"
                           required
-                          className="bg-white/70 border-green-300 text-gray-800 placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20"
+                          className="bg-white border-orange-300 text-orange-900 placeholder:text-orange-400 focus:border-orange-500 focus:ring-orange-500/20"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <Separator className="bg-green-300" />
+                  <Separator className="bg-orange-200" />
 
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-lg text-green-600 border-b border-green-300 pb-2">
+                    <h3 className="font-semibold text-lg text-orange-700 border-b border-orange-200 pb-2">
                       Payment Method
                     </h3>
 
@@ -455,37 +454,37 @@ const Checkout = () => {
                       }
                       className="grid grid-cols-2 gap-3"
                     >
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-50 border border-green-300 hover:border-green-400 transition-colors">
-                        <RadioGroupItem value="gcash" id="gcash" className="border-green-500 text-green-600" />
-                        <Label htmlFor="gcash" className="text-gray-700 cursor-pointer flex items-center gap-2">
+                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-500 transition-colors">
+                        <RadioGroupItem value="gcash" id="gcash" className="border-orange-500 text-orange-600" />
+                        <Label htmlFor="gcash" className="text-orange-800 cursor-pointer flex items-center gap-2">
                           <Smartphone className="w-4 h-4" /> GCash
                         </Label>
                       </div>
 
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-50 border border-green-300 hover:border-green-400 transition-colors">
-                        <RadioGroupItem value="paypal" id="paypal" className="border-green-500 text-green-600" />
-                        <Label htmlFor="paypal" className="text-gray-700 cursor-pointer flex items-center gap-2">
+                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-500 transition-colors">
+                        <RadioGroupItem value="paypal" id="paypal" className="border-orange-500 text-orange-600" />
+                        <Label htmlFor="paypal" className="text-orange-800 cursor-pointer flex items-center gap-2">
                           <Wallet className="w-4 h-4" /> PayPal
                         </Label>
                       </div>
 
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-50 border border-green-300 hover:border-green-400 transition-colors">
-                        <RadioGroupItem value="bpi" id="bpi" className="border-green-500 text-green-600" />
-                        <Label htmlFor="bpi" className="text-gray-700 cursor-pointer flex items-center gap-2">
+                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-500 transition-colors">
+                        <RadioGroupItem value="bpi" id="bpi" className="border-orange-500 text-orange-600" />
+                        <Label htmlFor="bpi" className="text-orange-800 cursor-pointer flex items-center gap-2">
                           <Building2 className="w-4 h-4" /> BPI Online
                         </Label>
                       </div>
 
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-50 border border-green-300 hover:border-green-400 transition-colors">
-                        <RadioGroupItem value="maya" id="maya" className="border-green-500 text-green-600" />
-                        <Label htmlFor="maya" className="text-gray-700 cursor-pointer flex items-center gap-2">
+                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-500 transition-colors">
+                        <RadioGroupItem value="maya" id="maya" className="border-orange-500 text-orange-600" />
+                        <Label htmlFor="maya" className="text-orange-800 cursor-pointer flex items-center gap-2">
                           <Wallet className="w-4 h-4" /> Maya
                         </Label>
                       </div>
 
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-50 border border-green-300 hover:border-green-400 transition-colors col-span-2">
-                        <RadioGroupItem value="cash" id="cash" className="border-green-500 text-green-600" />
-                        <Label htmlFor="cash" className="text-gray-700 cursor-pointer flex items-center gap-2">
+                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-500 transition-colors col-span-2">
+                        <RadioGroupItem value="cash" id="cash" className="border-orange-500 text-orange-600" />
+                        <Label htmlFor="cash" className="text-orange-800 cursor-pointer flex items-center gap-2">
                           <Banknote className="w-4 h-4" /> Cash on Delivery
                         </Label>
                       </div>
@@ -495,15 +494,15 @@ const Checkout = () => {
                       checkoutInfo.paymentMethod === "paypal" ||
                       checkoutInfo.paymentMethod === "bpi" ||
                       checkoutInfo.paymentMethod === "maya") && (
-                      <div className="space-y-4 pt-4 border-t border-green-300">
+                      <div className="space-y-4 pt-4 border-t border-orange-200">
                         <div className="text-center">
-                          <h4 className="text-green-600 font-semibold mb-3">
+                          <h4 className="text-orange-700 font-semibold mb-3">
                             {checkoutInfo.paymentMethod === "gcash" && "GCash Payment"}
                             {checkoutInfo.paymentMethod === "paypal" && "PayPal Payment"}
                             {checkoutInfo.paymentMethod === "bpi" && "BPI Online Banking"}
                             {checkoutInfo.paymentMethod === "maya" && "Maya Payment"}
                           </h4>
-                          <div className="bg-white p-4 rounded-lg inline-block">
+                          <div className="bg-white p-4 rounded-lg inline-block border border-orange-200 shadow-sm">
                             <img
                               src="https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop"
                               alt="QR Code"
@@ -511,19 +510,19 @@ const Checkout = () => {
                             />
                           </div>
                           <div className="mt-4 space-y-2">
-                            <p className="text-gray-600 text-sm">Scan QR code with your payment app</p>
-                            <p className="text-green-600 font-mono">
+                            <p className="text-orange-600 text-sm">Scan QR code with your payment app</p>
+                            <p className="text-orange-700 font-mono text-sm">
                               {checkoutInfo.paymentMethod === "gcash" && "GCash: +63 917 123 4567"}
-                              {checkoutInfo.paymentMethod === "paypal" && "PayPal: koreanfood@restaurant.com"}
+                              {checkoutInfo.paymentMethod === "paypal" && "PayPal: japaneseizakaya@restaurant.com"}
                               {checkoutInfo.paymentMethod === "bpi" && "Account: 1234-5678-90"}
                               {checkoutInfo.paymentMethod === "maya" && "Maya: +63 917 987 6543"}
                             </p>
-                            <p className="text-emerald-600 font-semibold">Amount: ₱{formatPrice(total)}</p>
+                            <p className="text-orange-700 font-semibold">Amount: ₱{formatPrice(total)}</p>
                           </div>
-                          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-300">
+                          <div className="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-300">
                             <Label
                               htmlFor="receipt"
-                              className="text-green-600 font-medium block mb-2 flex items-center gap-2 justify-center"
+                              className="text-orange-700 font-medium block mb-2 flex items-center gap-2 justify-center"
                             >
                               <FileText className="w-4 h-4" /> Upload Payment Receipt
                             </Label>
@@ -532,26 +531,26 @@ const Checkout = () => {
                               type="file"
                               accept="image/*"
                               onChange={handleReceiptUpload}
-                              className="bg-white border-green-300 text-gray-800 file:bg-green-500 file:text-white file:border-0 file:rounded file:px-3 file:py-1 file:mr-3 hover:file:bg-green-600"
+                              className="bg-white border-orange-300 text-orange-900 file:bg-orange-500 file:text-white file:border-0 file:rounded file:px-3 file:py-1 file:mr-3 hover:file:bg-orange-600"
                             />
                             {receiptFile && receiptPreview && (
                               <div className="mt-4 relative">
                                 <div className="relative inline-block">
                                   <img
-                                    src={receiptPreview}
+                                    src={receiptPreview || "/placeholder.svg"}
                                     alt="Receipt preview"
-                                    className="max-w-full h-auto max-h-64 rounded-lg border-2 border-green-300"
+                                    className="max-w-full h-auto max-h-64 rounded-lg border-2 border-orange-300"
                                   />
                                   <button
                                     type="button"
                                     onClick={handleRemoveReceipt}
-                                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-lg transition-colors"
+                                    className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-lg transition-colors"
                                     aria-label="Remove receipt"
                                   >
                                     <X className="h-4 w-4" />
                                   </button>
                                 </div>
-                                <p className="text-green-600 text-sm mt-2">✓ {receiptFile.name}</p>
+                                <p className="text-orange-700 text-sm mt-2">✓ {receiptFile.name}</p>
                               </div>
                             )}
                           </div>
@@ -560,14 +559,14 @@ const Checkout = () => {
                     )}
                   </div>
 
-                  <Separator className="bg-green-300" />
+                  <Separator className="bg-orange-200" />
 
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-lg text-green-600 border-b border-green-300 pb-2">
+                    <h3 className="font-semibold text-lg text-orange-700 border-b border-orange-200 pb-2">
                       Additional Notes
                     </h3>
                     <div>
-                      <Label htmlFor="notes" className="text-gray-700">
+                      <Label htmlFor="notes" className="text-orange-800">
                         Special Instructions (Optional)
                       </Label>
                       <Input
@@ -575,14 +574,14 @@ const Checkout = () => {
                         value={checkoutInfo.notes}
                         onChange={(e) => handleInputChange("notes", e.target.value)}
                         placeholder="Any special requests or delivery instructions..."
-                        className="bg-white/70 border-green-300 text-gray-800 placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20"
+                        className="bg-white border-orange-300 text-orange-900 placeholder:text-orange-400 focus:border-orange-500 focus:ring-orange-500/20"
                       />
                     </div>
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
                     size="lg"
                     disabled={isProcessing}
                   >
@@ -599,8 +598,8 @@ const Checkout = () => {
               </CardContent>
             </Card>
 
-            <Card className="h-fit bg-white/70 backdrop-blur-md border-green-200 shadow-2xl rounded-2xl sticky top-24">
-              <CardHeader className="border-b border-green-200 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-t-2xl !p-4">
+            <Card className="h-fit bg-white/95 backdrop-blur-md border-orange-300 shadow-2xl rounded-2xl sticky top-24">
+              <CardHeader className="border-b border-orange-200 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-t-2xl !p-4">
                 <CardTitle className="text-xl">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 p-6">
@@ -612,53 +611,51 @@ const Checkout = () => {
                     return (
                       <div
                         key={item.id}
-                        className="flex justify-between items-center p-3 rounded-lg bg-green-50 border border-green-200"
+                        className="flex justify-between items-center p-3 rounded-lg bg-orange-50 border border-orange-200"
                       >
                         <div className="flex-1">
-                          <div className="font-medium text-sm text-gray-700">{item.name}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="font-medium text-sm text-orange-800">{item.name}</div>
+                          <div className="text-xs text-orange-600">
                             Qty: {item.quantity} × ₱{formatPrice(itemPrice)}
                           </div>
                         </div>
-                        <div className="font-medium text-green-600">₱{formatPrice(itemTotal)}</div>
+                        <div className="font-medium text-orange-700">₱{formatPrice(itemTotal)}</div>
                       </div>
                     )
                   })}
                 </div>
 
-                <Separator className="bg-green-300" />
+                <Separator className="bg-orange-200" />
 
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-gray-600">
+                  <div className="flex justify-between text-sm text-orange-700">
                     <span>Subtotal</span>
                     <span>₱{formatPrice(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-sm text-gray-600">
+                  <div className="flex justify-between text-sm text-orange-700">
                     <span className="flex items-center gap-1">
                       <TruckIcon className="w-3 h-3" />
                       Delivery Fee
                     </span>
-                    <span className={isCalculatingFee ? "animate-pulse" : ""}>
-                      ₱{formatPrice(deliveryFee)}
-                    </span>
+                    <span className={isCalculatingFee ? "animate-pulse" : ""}>₱{formatPrice(deliveryFee)}</span>
                   </div>
-                  <Separator className="bg-green-300" />
+                  <Separator className="bg-orange-200" />
                   <div className="flex justify-between font-semibold text-lg">
-                    <span className="text-green-600">Total</span>
-                    <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    <span className="text-orange-700">Total</span>
+                    <span className="bg-gradient-to-r from-orange-600 to-orange-800 bg-clip-text text-transparent">
                       ₱{formatPrice(total)}
                     </span>
                   </div>
                 </div>
 
                 <div className="text-xs text-center pt-4 space-y-2">
-                  <div className="flex items-center justify-center gap-2 text-green-600">
+                  <div className="flex items-center justify-center gap-2 text-orange-600">
                     <Lock className="w-4 h-4" /> <span>Your payment information is secure</span>
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-gray-600">
+                  <div className="flex items-center justify-center gap-2 text-orange-600">
                     <Package className="w-4 h-4" /> <span>Estimated delivery: 30-45 minutes</span>
                   </div>
-                  <div className="text-green-600">Thank you for your order! 🍜</div>
+                  <div className="text-orange-700 font-medium">Thank you for your order! 🍱</div>
                 </div>
               </CardContent>
             </Card>

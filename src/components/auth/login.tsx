@@ -29,8 +29,8 @@ export default function LoginPage() {
     e.preventDefault()
 
     if (!formData.email || !formData.password) {
-      toast.error("Missing Information 정보 누락", {
-        description: "Please fill in all required fields. 필수 항목을 모두 입력해 주세요.",
+      toast.error("Missing Information", {
+        description: "Please fill in all required fields.",
       })
       return
     }
@@ -63,7 +63,7 @@ export default function LoginPage() {
         window.dispatchEvent(new CustomEvent("userDataUpdated"))
 
         toast.success("Login Successful!", {
-          description: "Welcome back to BONGA Restaurant!",
+          description: "Welcome back to Izakaya Tori Ichizu!",
         })
 
         const userRole = user?.role?.toLowerCase?.() || user?.role || ""
@@ -83,14 +83,14 @@ export default function LoginPage() {
           router.push(redirectPath)
         }, 1500)
       } else {
-        toast.error("Login Failed 로그인 실패", {
-          description: data.message || "Login failed. Please try again. 로그인에 실패했습니다.",
+        toast.error("Login Failed", {
+          description: data.message || "Login failed. Please try again.",
         })
       }
     } catch (error) {
       console.error("Login error:", error)
-      toast.error("Connection Error 연결 오류", {
-        description: "Unable to login. Please check your connection and try again. 연결을 확인하고 다시 시도해 주세요.",
+      toast.error("Connection Error", {
+        description: "Unable to login. Please check your connection and try again.",
       })
     } finally {
       setIsSubmitting(false)
@@ -99,32 +99,27 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="min-h-screen py-8 bg-gradient-to-br from-green-50 via-amber-50 to-cream-50 relative overflow-hidden">
+      <div className="min-h-screen py-8 bg-gradient-to-br from-black via-orange-900 to-yellow-900 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 left-10 w-32 h-32 border-2 border-green-200 rounded-full"></div>
-          <div className="absolute top-32 right-20 w-24 h-24 border-2 border-amber-200 rounded-full"></div>
-          <div className="absolute bottom-20 left-1/4 w-40 h-40 border-2 border-green-200 rounded-full"></div>
-          <div className="absolute bottom-32 right-10 w-28 h-28 border-2 border-amber-200 rounded-full"></div>
+          <div className="absolute top-10 left-10 w-32 h-32 border-2 border-yellow-400 rounded-full"></div>
+          <div className="absolute top-32 right-20 w-24 h-24 border-2 border-orange-400 rounded-full"></div>
+          <div className="absolute bottom-20 left-1/4 w-40 h-40 border-2 border-yellow-400 rounded-full"></div>
+          <div className="absolute bottom-32 right-10 w-28 h-28 border-2 border-orange-400 rounded-full"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-screen">
-          <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm border-green-200/50 shadow-lg">
-            <CardHeader className="text-center">
-              <CardTitle className="text-3xl text-gray-800 mb-2">BONGA Restaurant</CardTitle>
-              <h2 className="text-2xl text-gray-800">
-                {" "}
-                <span className="text-transparent bg-gradient-to-r from-green-600 to-green-700 bg-clip-text">
-                  Login
-                </span>
-              </h2>
-              <p className="text-gray-600 mt-2">Welcome back!</p>
+          <Card className="w-full max-w-md bg-white shadow-2xl border-4 border-orange-400 !p-0">
+            <CardHeader className="text-center bg-gradient-to-r from-orange-500 to-yellow-500 rounded-t-lg !p-0 px-6 py-4 !m-0">
+              <CardTitle className="text-3xl text-white mb-2 !mt-0">Izakaya Tori Ichizu</CardTitle>
+              <h2 className="text-2xl text-white font-bold">Login</h2>
+              <p className="text-white/90 mt-2">Welcome back!</p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6 p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="email" className="text-gray-700 flex items-center gap-2 mb-2">
-                    <Mail className="w-4 h-4" />
-                    Email Address 이메일
+                  <Label htmlFor="email" className="text-black font-semibold flex items-center gap-2 mb-2">
+                    <Mail className="w-4 h-4 text-orange-500" />
+                    Email Address
                   </Label>
                   <Input
                     id="email"
@@ -133,15 +128,15 @@ export default function LoginPage() {
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     placeholder="your@email.com"
                     required
-                    className="border-green-200 focus:border-green-400 focus:ring-green-200 h-12 text-base"
+                    className="border-2 border-orange-300 bg-white text-black placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-400/30 h-12 text-base"
                     disabled={isSubmitting}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="password" className="text-gray-700 flex items-center gap-2 mb-2">
-                    <Lock className="w-4 h-4" />
-                    Password 비밀번호
+                  <Label htmlFor="password" className="text-black font-semibold flex items-center gap-2 mb-2">
+                    <Lock className="w-4 h-4 text-orange-500" />
+                    Password
                   </Label>
                   <div className="relative">
                     <Input
@@ -151,13 +146,13 @@ export default function LoginPage() {
                       onChange={(e) => handleInputChange("password", e.target.value)}
                       placeholder="Enter your password"
                       required
-                      className="border-green-200 focus:border-green-400 focus:ring-green-200 h-12 text-base pr-10"
+                      className="border-2 border-orange-300 bg-white text-black placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-400/30 h-12 text-base pr-10"
                       disabled={isSubmitting}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-700 transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -166,36 +161,31 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 h-14 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  style={{
-                    background: "linear-gradient(to right, #16a34a, #15803d) !important",
-                    color: "#ffffff !important",
-                    opacity: "1 !important",
-                  }}
+                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold py-3 h-14 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   size="lg"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <span className="flex items-center gap-2" style={{ color: "#ffffff !important" }}>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span style={{ color: "#ffffff !important" }}>Logging in... 로그인 중...</span>
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                      <span>Logging in...</span>
                     </span>
                   ) : (
-                    <span className="flex items-center" style={{ color: "#ffffff !important" }}>
-                      <LogIn className="w-4 h-4 mr-2" style={{ color: "#ffffff !important" }} />
-                      <span style={{ color: "#ffffff !important" }}>로그인 Login</span>
+                    <span className="flex items-center">
+                      <LogIn className="w-4 h-4 mr-2" />
+                      <span>Login</span>
                     </span>
                   )}
                 </Button>
 
                 <div className="text-center pt-4">
-                  <p className="text-gray-600">
-                    Don't have an account? 계정이 없으신가요?{" "}
+                  <p className="text-black/80">
+                    Don't have an account?{" "}
                     <Link
                       href="/register"
-                      className="text-green-600 hover:text-green-700 font-semibold transition-colors"
+                      className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
                     >
-                      Register here 회원가입
+                      Register here
                     </Link>
                   </p>
                 </div>

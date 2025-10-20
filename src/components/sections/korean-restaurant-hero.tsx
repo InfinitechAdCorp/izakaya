@@ -24,7 +24,7 @@ export default function KoreanRestaurantHero() {
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
               Welcome to <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500">
-                BON GA Restaurant
+                Izakaya Tori Ichizu Restaurant
               </span>
             </h1>
 

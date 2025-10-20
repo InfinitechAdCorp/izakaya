@@ -11,6 +11,7 @@ import {
   ChevronDown,
   Flame,
   TrendingUp,
+  ChefHat,
 } from "lucide-react"
 
 import {
@@ -67,11 +68,44 @@ const items = [
     bgColor: "hover:bg-gradient-to-r hover:from-green-50 hover:to-amber-50",
   },
   {
-    title: "Announcements",
-    url: "/admin/announcements",
+    title: "Content Management",
     icon: Megaphone,
     color: "text-amber-600",
     bgColor: "hover:bg-gradient-to-r hover:from-amber-50 hover:to-green-50",
+    items: [
+      {
+        title: "Announcements",
+        url: "/admin/announcements",
+      },
+      {
+        title: "Blog Posts",
+        url: "/admin/blog-posts",
+      },
+      {
+        title: "Testimonials",
+        url: "/admin/testimonials",
+      },
+      {
+        title: "Events",
+        url: "/admin/events",
+      },
+    ],
+  },
+  {
+    title: "Restaurant",
+    icon: ChefHat,
+    color: "text-green-700",
+    bgColor: "hover:bg-gradient-to-r hover:from-green-50 hover:to-amber-50",
+    items: [
+      {
+        title: "Chefs",
+        url: "/admin/chefs",
+      },
+      {
+        title: "Reservations",
+        url: "/admin/reservations",
+      },
+    ],
   },
   {
     title: "Reports",

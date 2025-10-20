@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { MessageCircle, X, RotateCcw, Send } from "lucide-react"
+import { MessageCircle, X, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -15,9 +15,9 @@ type Message = {
 
 const FAQ_DATA = [
   {
-    question: "What type of restaurant is Bon Ga?",
+    question: "What type of restaurant is Izakaya Tori Ichizu?",
     answer:
-      "Bon Ga is an authentic Korean restaurant that brings traditional Korean flavors with a modern twist. We've been serving the community since 2018.",
+      "Izakaya Tori Ichizu is an authentic Japanese izakaya specializing in yakitori (grilled chicken skewers) and traditional Japanese pub fare. We've been serving the community since 2018.",
   },
   {
     question: "What are your operating hours?",
@@ -25,12 +25,13 @@ const FAQ_DATA = [
   },
   {
     question: "Do you offer vegetarian or vegan options?",
-    answer: "Yes! We offer vegetarian and vegan options without compromising on authentic Korean flavors.",
+    answer:
+      "Yes! We offer vegetarian and vegan options including vegetable yakitori, edamame, and traditional Japanese vegetable dishes.",
   },
   {
-    question: "What makes Bon Ga special?",
+    question: "What makes Izakaya Tori Ichizu special?",
     answer:
-      "We make fresh kimchi daily using family recipes, use premium Wagyu beef for our signature bulgogi, and provide a traditional Korean dining experience. We're a family-owned restaurant with three generations of Korean cooking tradition.",
+      "We specialize in premium yakitori using the finest chicken, grilled over charcoal to perfection. Our chefs are trained in Tokyo and bring authentic Japanese izakaya experience with traditional recipes and warm hospitality.",
   },
   {
     question: "Do you take reservations?",
@@ -39,7 +40,7 @@ const FAQ_DATA = [
   {
     question: "What are your signature dishes?",
     answer:
-      "Our signature dishes include authentic Korean BBQ with premium Wagyu beef bulgogi, traditional kimchi made fresh daily, and various traditional Korean dishes prepared by our experienced chefs trained in Seoul.",
+      "Our signature dishes include premium yakitori (grilled chicken skewers), fresh sashimi, traditional ramen, and authentic Japanese appetizers prepared by our experienced chefs trained in Tokyo.",
   },
 ]
 
@@ -53,7 +54,7 @@ export default function CustomerServiceChatbot() {
   useEffect(() => {
     if (isOpen && messages.length === 0 && !isChatEnded) {
       setTimeout(() => {
-        addBotMessage("Hello! Welcome to Bon Ga Restaurant 🍜 Please select a question below to get started!")
+        addBotMessage("Hello! Welcome to Izakaya Tori Ichizu 🍗 Please select a question below to get started!")
       }, 500)
     }
   }, [isOpen])
@@ -92,7 +93,7 @@ export default function CustomerServiceChatbot() {
     setMessages([])
     setIsChatEnded(false)
     setTimeout(() => {
-      addBotMessage("Hello! Welcome back to Bon Ga Restaurant 🍜 Please select a question below to get started!")
+      addBotMessage("Hello! Welcome back to Izakaya Tori Ichizu 🍗 Please select a question below to get started!")
     }, 500)
   }
 
@@ -120,7 +121,7 @@ export default function CustomerServiceChatbot() {
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-xl bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 z-50 transition-all duration-300 hover:scale-110"
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-xl bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 z-50 transition-all duration-300 hover:scale-110"
           size="icon"
         >
           <MessageCircle className="h-7 w-7 text-white" />
@@ -129,9 +130,9 @@ export default function CustomerServiceChatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full md:w-[420px] h-[85vh] md:h-[700px] max-h-[700px] shadow-2xl z-50 flex flex-col border-green-200 rounded-t-2xl md:rounded-2xl overflow-hidden p-0">
+        <Card className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full md:w-[420px] h-[85vh] md:h-[700px] max-h-[700px] shadow-2xl z-50 flex flex-col border-orange-200 rounded-t-2xl md:rounded-2xl overflow-hidden p-0">
           {/* Header */}
-          <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-500 text-white flex flex-row items-center justify-between p-4 flex-shrink-0">
+          <CardHeader className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white flex flex-row items-center justify-between p-4 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="h-11 w-11 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
                 <MessageCircle className="h-6 w-6" />
@@ -139,8 +140,8 @@ export default function CustomerServiceChatbot() {
               <div>
                 <CardTitle className="text-lg font-semibold">Customer Service</CardTitle>
                 <p className="text-xs text-white/90 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
-                  Bon Ga Restaurant
+                  <span className="w-2 h-2 bg-yellow-300 rounded-full animate-pulse"></span>
+                  Izakaya Tori Ichizu
                 </p>
               </div>
             </div>
@@ -155,7 +156,7 @@ export default function CustomerServiceChatbot() {
           </CardHeader>
 
           <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
-            {/* Messages Area - Takes remaining space and scrolls */}
+            {/* Messages Area */}
             <div className="flex-1 overflow-hidden">
               <ScrollArea ref={scrollAreaRef} className="h-full px-4 py-3">
                 <div className="space-y-3 pb-2">
@@ -167,7 +168,7 @@ export default function CustomerServiceChatbot() {
                       <div
                         className={`max-w-[85%] rounded-2xl px-4 py-2.5 shadow-sm ${
                           message.sender === "user"
-                            ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-tr-sm"
+                            ? "bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-tr-sm"
                             : "bg-white text-gray-800 border border-gray-200 rounded-tl-sm"
                         }`}
                       >
@@ -188,15 +189,15 @@ export default function CustomerServiceChatbot() {
                       <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-200">
                         <div className="flex gap-1">
                           <div
-                            className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+                            className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"
                             style={{ animationDelay: "0ms" }}
                           ></div>
                           <div
-                            className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+                            className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"
                             style={{ animationDelay: "150ms" }}
                           ></div>
                           <div
-                            className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+                            className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"
                             style={{ animationDelay: "300ms" }}
                           ></div>
                         </div>
@@ -207,12 +208,10 @@ export default function CustomerServiceChatbot() {
               </ScrollArea>
             </div>
 
-            {/* Quick Replies Section - Fixed at bottom, always visible */}
+            {/* Quick Replies Section */}
             {!isChatEnded && (
               <div className="border-t-2 border-gray-200 bg-white px-4 py-3 flex-shrink-0">
-                <p className="text-[11px] font-semibold text-gray-500 mb-2.5 uppercase tracking-wide">
-                  Quick replies:
-                </p>
+                <p className="text-[11px] font-semibold text-gray-500 mb-2.5 uppercase tracking-wide">Quick replies:</p>
                 <div className="max-h-[140px] overflow-y-auto">
                   <div className="flex flex-wrap gap-2 pr-1">
                     {FAQ_DATA.map((faq, index) => (
@@ -220,7 +219,7 @@ export default function CustomerServiceChatbot() {
                         key={index}
                         onClick={() => handleFAQClick(faq.question, faq.answer)}
                         disabled={isTyping}
-                        className="text-[11px] px-3 py-1.5 rounded-full border-2 border-green-300 text-green-700 hover:bg-green-500 hover:text-white hover:border-green-500 bg-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-normal text-left leading-snug"
+                        className="text-[11px] px-3 py-1.5 rounded-full border-2 border-orange-300 text-orange-700 hover:bg-orange-500 hover:text-white hover:border-orange-500 bg-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-normal text-left leading-snug"
                       >
                         {faq.question}
                       </button>
@@ -230,13 +229,13 @@ export default function CustomerServiceChatbot() {
               </div>
             )}
 
-            {/* Footer - End Chat / New Chat Button */}
+            {/* Footer */}
             <div className="border-t border-gray-200 px-4 py-3 bg-white flex-shrink-0">
               {!isChatEnded ? (
                 <Button
                   onClick={handleEndChat}
                   variant="outline"
-                  className="w-full text-sm border-2 border-green-300 text-green-700 hover:bg-green-500 hover:text-white hover:border-green-500 bg-white font-medium rounded-xl h-10 transition-all duration-200"
+                  className="w-full text-sm border-2 border-orange-300 text-orange-700 hover:bg-orange-500 hover:text-white hover:border-orange-500 bg-white font-medium rounded-xl h-10 transition-all duration-200"
                   disabled={isTyping}
                 >
                   End Chat
@@ -246,7 +245,7 @@ export default function CustomerServiceChatbot() {
                   <p className="text-sm text-gray-500 mb-3 font-medium">Chat has ended</p>
                   <Button
                     onClick={handleNewChat}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium rounded-xl h-10 shadow-md"
+                    className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-medium rounded-xl h-10 shadow-md"
                   >
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Start New Chat

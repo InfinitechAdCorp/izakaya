@@ -68,7 +68,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "bon ga-cart-storage",
+      name: "Izakaya Tori Ichizu-cart-storage",
     },
   ),
 )

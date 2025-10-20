@@ -20,8 +20,8 @@
   "display": "standalone",
   "dir": "auto",
   "lang": "en-US",
-  "name": "Bon Ga Restaurant",
-  "short_name": "Bon Ga",
+  "name": "Izakaya Tori Ichizu",
+  "short_name": "izakaya",
   "start_url": "/",
   "scope": "/"
 }

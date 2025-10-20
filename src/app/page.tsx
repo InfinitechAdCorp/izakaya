@@ -3,7 +3,7 @@ import HeroSection from "@/components/sections/Hero"
 import FeaturedMenu from "@/components/sections/FeaturedMenu"
 import AboutPreview from "@/components/sections/HomePreview"
 import CTASection from "@/components/sections/CTASection"
-
+import TestimonialsSection from "@/components/testimonials-section"
 export default function Home() {
   const featuredItems = menuItems.slice(0, 3)
 
@@ -17,7 +17,7 @@ export default function Home() {
 
       {/* About Preview Section */}
       <AboutPreview />
-
+<TestimonialsSection/>
       {/* CTA Section */}
       <CTASection />
     </div>

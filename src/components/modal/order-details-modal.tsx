@@ -38,9 +38,9 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
     return (
       <div className="w-full max-w-md">
         <div className="relative flex items-center justify-between mb-2">
-          <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-amber-600 -translate-y-1/2"></div>
+          <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-orange-600 -translate-y-1/2"></div>
           <div
-            className="absolute top-1/2 left-4 h-0.5 bg-green-600 -translate-y-1/2 transition-all duration-500"
+            className="absolute top-1/2 left-4 h-0.5 bg-yellow-600 -translate-y-1/2 transition-all duration-500"
             style={{
               width: currentIndex > 0 ? `${(currentIndex / (steps.length - 1)) * 100}%` : "0%",
               maxWidth: "calc(100% - 32px)",
@@ -52,7 +52,7 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
               key={step}
               className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
                 index <= currentIndex
-                  ? "bg-green-600 border-green-600 text-white"
+                  ? "bg-orange-600 border-orange-600 text-white"
                   : "bg-gray-600 border-gray-500 text-gray-400"
               }`}
             >
@@ -78,11 +78,11 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="bg-gradient-to-br from-gray-900 to-black border-green-400/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <Card className="bg-gradient-to-br from-gray-900 to-black border-orange-400/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <CardHeader className="border-b border-white/10">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="text-xl text-green-400">Order Details - #{order.id}</CardTitle>
+              <CardTitle className="text-xl text-orange-400">Order Details - #{order.id}</CardTitle>
               <p className="text-gray-300 text-sm mt-1">Placed on {new Date(order.date).toLocaleDateString()}</p>
             </div>
             <Button variant="ghost" size="sm" onClick={onClose} className="text-gray-400 hover:text-black">
@@ -110,7 +110,7 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
               <h3 className="text-white font-semibold mb-3">Delivery Information</h3>
               <div className="bg-black/20 rounded-lg p-4 space-y-3">
                 <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-green-400 mt-0.5" />
+                  <MapPin className="w-4 h-4 text-orange-400 mt-0.5" />
                   <div>
                     <p className="text-white text-sm font-medium">Delivery Address</p>
                     <p className="text-gray-300 text-sm">{order.deliveryAddress}</p>
@@ -118,7 +118,7 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
                 </div>
                 {order.estimatedDelivery && (
                   <div className="flex items-start gap-2">
-                    <Calendar className="w-4 h-4 text-green-400 mt-0.5" />
+                    <Calendar className="w-4 h-4 text-orange-400 mt-0.5" />
                     <div>
                       <p className="text-white text-sm font-medium">Estimated Delivery</p>
                       <p className="text-gray-300 text-sm">{new Date(order.estimatedDelivery).toLocaleDateString()}</p>
@@ -142,7 +142,7 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
                     <p className="text-gray-400 text-sm">Quantity: {item.quantity}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-green-400 font-medium">₱{(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-orange-400 font-medium">₱{(item.price * item.quantity).toFixed(2)}</p>
                     <p className="text-gray-400 text-sm">₱{item.price.toFixed(2)} each</p>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
               <div className="pt-3 border-t border-white/20">
                 <div className="flex justify-between items-center">
                   <p className="text-white font-semibold">Total Amount</p>
-                  <p className="text-xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">
+                  <p className="text-xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
                     ₱{order.total.toFixed(2)}
                   </p>
                 </div>
@@ -161,7 +161,7 @@ const OrderDetailsModal = ({ order, onClose }: OrderDetailsModalProps) => {
           <div className="flex gap-3 pt-4">
             <Button
               variant="outline"
-              className="border-green-400/50 text-green-400 hover:bg-green-400/20 bg-transparent"
+              className="border-orange-400/50 text-orange-400 hover:bg-orange-400/20 bg-transparent"
             >
               <Phone className="w-4 h-4 mr-2" />
               Contact Support

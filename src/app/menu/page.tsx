@@ -50,10 +50,10 @@ export default function MenuPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-900 via-emerald-800 to-green-700 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-black via-orange-900 to-yellow-900 flex items-center justify-center">
         <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-6 py-4 rounded-xl">
-          <Loader2 className="h-6 w-6 animate-spin text-white" />
-          <span className="text-white font-medium">Loading menu...</span>
+          <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
+          <span className="text-yellow-100 font-medium">Loading menu...</span>
         </div>
       </div>
     )
@@ -61,21 +61,21 @@ export default function MenuPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-900 via-emerald-800 to-green-700 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-black via-orange-900 to-yellow-900 flex items-center justify-center">
         <div className="text-center bg-white/10 backdrop-blur-sm px-6 py-4 rounded-xl">
-          <p className="text-white font-medium mb-2">Failed to load menu</p>
-          <p className="text-white/80 text-sm">{error}</p>
+          <p className="text-yellow-100 font-medium mb-2">Failed to load menu</p>
+          <p className="text-yellow-200/80 text-sm">{error}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-emerald-800 to-green-700 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-black via-orange-900 to-yellow-900 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Korean Menu</h1>
-          <p className="text-white/90 text-lg md:text-xl">Authentic Korean flavors delivered fresh</p>
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Izakaya Menu</h1>
+          <p className="text-yellow-200 text-lg md:text-xl">Authentic Japanese izakaya flavors delivered fresh</p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -86,8 +86,8 @@ export default function MenuPage() {
               onClick={() => setSelectedCategory(category)}
               className={`${
                 selectedCategory === category
-                  ? "bg-white text-green-600 hover:bg-white/90"
-                  : "bg-white/20 text-white border-white/30 hover:bg-white/30"
+                  ? "bg-yellow-400 text-black hover:bg-yellow-300"
+                  : "bg-orange-600/30 text-yellow-100 border-orange-400/50 hover:bg-orange-600/50"
               } transition-all duration-200`}
             >
               {category}
@@ -97,7 +97,7 @@ export default function MenuPage() {
 
         {filtered.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-white/80 text-lg">
+            <p className="text-yellow-200/80 text-lg">
               {selectedCategory === "All"
                 ? "No menu items available"
                 : `No items found in ${selectedCategory} category`}

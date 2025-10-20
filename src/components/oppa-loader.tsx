@@ -1,12 +1,9 @@
-"use client"
-
 import { useState, useEffect } from "react"
 
-export default function BongaLoader() {
+export default function IzakayaLoader() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate loading time
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 2000)
@@ -17,177 +14,121 @@ export default function BongaLoader() {
   if (!isLoading) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-stone-50 via-emerald-50 to-amber-50">
-      <div className="text-center">
-        <div className="relative mb-12">
-          {/* Traditional Korean Roof - inspired by logo */}
-          <div className="relative w-64 mx-auto">
-            {/* Roof structure with curved tiles */}
-            <div className="relative">
-              {/* Main roof curve */}
-              <svg viewBox="0 0 200 60" className="w-full h-auto animate-pulse" xmlns="http://www.w3.org/2000/svg">
-                {/* Roof shadow */}
-                <path
-                  d="M 10 45 Q 100 35 190 45"
-                  fill="none"
-                  stroke="#1a4d2e"
-                  strokeWidth="8"
-                  opacity="0.2"
-                  strokeLinecap="round"
-                />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-black via-orange-900 to-yellow-900 overflow-hidden">
+      {/* Animated background orbs */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-40 right-10 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
-                {/* Main roof body */}
-                <path
-                  d="M 10 40 Q 100 30 190 40"
-                  fill="none"
-                  stroke="#2d5016"
-                  strokeWidth="12"
-                  strokeLinecap="round"
-                  className="animate-pulse"
-                />
+      <style>{`
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
 
-                {/* Roof tiles pattern */}
-                {[...Array(12)].map((_, i) => (
-                  <ellipse
-                    key={i}
-                    cx={20 + i * 14}
-                    cy={40 - Math.sin(i * 0.5) * 5}
-                    rx="6"
-                    ry="3"
-                    fill="#3d6b1f"
-                    opacity="0.8"
+      <div className="text-center relative z-10">
+        {/* Animated ramen bowl */}
+        <div className="mb-12 flex justify-center items-center">
+          <div className="relative w-40 h-40">
+            {/* Steaming effect */}
+            <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-3 h-16 bg-gradient-to-t from-yellow-300/50 to-transparent rounded-full blur-md"
+                  style={{
+                    left: `${-30 + i * 20}px`,
+                    animation: "float 3s ease-in-out infinite",
+                    animationDelay: `${i * 250}ms`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Bowl rim */}
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-12 bg-gradient-to-b from-orange-600 to-orange-700 rounded-t-3xl border-4 border-orange-500 shadow-lg"></div>
+
+            {/* Bowl body */}
+            <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-40 h-28 bg-gradient-to-b from-orange-700 to-orange-900 rounded-b-3xl border-4 border-orange-600 shadow-2xl">
+              {/* Inner glow */}
+              <div className="absolute inset-0 bg-gradient-to-b from-yellow-200/10 via-transparent to-transparent rounded-b-3xl"></div>
+
+              {/* Noodle swirl animation */}
+              <div className="absolute inset-4">
+                <svg viewBox="0 0 100 60" className="w-full h-full opacity-60">
+                  <path
+                    d="M10,30 Q25,15 40,30 T70,30 T100,30"
+                    stroke="#fbbf24"
+                    strokeWidth="2"
+                    fill="none"
                     className="animate-pulse"
-                    style={{ animationDelay: `${i * 100}ms` }}
                   />
-                ))}
-
-                {/* Roof edge decorations */}
-                <circle
-                  cx="15"
-                  cy="42"
-                  r="4"
-                  fill="#4a7c2f"
-                  className="animate-bounce"
-                  style={{ animationDelay: "0ms" }}
-                />
-                <circle
-                  cx="100"
-                  cy="32"
-                  r="5"
-                  fill="#4a7c2f"
-                  className="animate-bounce"
-                  style={{ animationDelay: "200ms" }}
-                />
-                <circle
-                  cx="185"
-                  cy="42"
-                  r="4"
-                  fill="#4a7c2f"
-                  className="animate-bounce"
-                  style={{ animationDelay: "400ms" }}
-                />
-              </svg>
-            </div>
-
-            {/* Steaming bowl beneath the roof */}
-            <div className="relative mt-4">
-              {/* Steam wisps rising */}
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-full">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute left-1/2 transform -translate-x-1/2 w-2 h-16 bg-gradient-to-t from-emerald-300/40 via-green-200/30 to-transparent rounded-full animate-pulse"
-                    style={{
-                      left: `${40 + i * 5}%`,
-                      animationDelay: `${i * 150}ms`,
-                      animationDuration: "2s",
-                      transform: `translateX(-50%) rotate(${(i - 2) * 3}deg)`,
-                    }}
+                  <path
+                    d="M15,35 Q30,22 45,35 T75,35"
+                    stroke="#fcd34d"
+                    strokeWidth="2"
+                    fill="none"
+                    className="animate-pulse"
+                    style={{ animationDelay: "200ms" }}
                   />
-                ))}
+                  <path
+                    d="M20,40 Q35,28 50,40 T80,40"
+                    stroke="#f59e0b"
+                    strokeWidth="2"
+                    fill="none"
+                    className="animate-pulse"
+                    style={{ animationDelay: "400ms" }}
+                  />
+                </svg>
               </div>
 
-              {/* Traditional bowl */}
-              <div className="w-32 h-16 mx-auto relative">
-                {/* Bowl shadow */}
-                <div className="absolute inset-0 bg-black/10 rounded-full blur-sm transform translate-y-1"></div>
-
-                {/* Bowl body */}
-                <div className="relative w-full h-full bg-gradient-to-b from-stone-200 via-stone-100 to-white rounded-full border-4 border-emerald-800 shadow-xl">
-                  {/* Bowl rim */}
-                  <div className="absolute top-0 inset-x-2 h-2 bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-700 rounded-full"></div>
-
-                  {/* Food/soup inside with bubbles */}
-                  <div className="absolute inset-3 bg-gradient-to-br from-amber-100 via-green-50 to-emerald-100 rounded-full overflow-hidden">
-                    {/* Animated bubbles */}
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="absolute w-2 h-2 bg-emerald-300/60 rounded-full animate-ping"
-                        style={{
-                          left: `${20 + i * 12}%`,
-                          top: `${30 + (i % 3) * 15}%`,
-                          animationDelay: `${i * 200}ms`,
-                          animationDuration: "1.5s",
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {/* Broth shine */}
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-3/4 h-2 bg-white/20 blur-sm rounded-full animate-pulse"></div>
             </div>
-          </div>
-
-          {/* Floating Korean pattern elements */}
-          <div className="absolute inset-0 pointer-events-none">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-3 h-3 border-2 border-emerald-400/30 rounded-sm animate-pulse"
-                style={{
-                  left: `${10 + i * 12}%`,
-                  top: `${20 + (i % 4) * 20}%`,
-                  animationDelay: `${i * 250}ms`,
-                  transform: `rotate(${i * 45}deg)`,
-                }}
-              />
-            ))}
           </div>
         </div>
 
         {/* Brand text */}
-        <div className="mb-8 relative">
-          {/* Korean characters style decoration */}
-          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            <div className="w-1 h-8 bg-gradient-to-b from-transparent via-red-500 to-transparent animate-pulse"></div>
-            <div
-              className="w-1 h-8 bg-gradient-to-b from-transparent via-amber-500 to-transparent animate-pulse"
-              style={{ animationDelay: "200ms" }}
-            ></div>
-          </div>
-
-          <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-800 via-green-700 to-emerald-800 animate-pulse drop-shadow-2xl tracking-wider">
-            BONGA
+        <div className="mb-10">
+          <h1 className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-400 to-red-500 mb-1 tracking-wider">
+            IZAKAYA
           </h1>
-          <p className="text-xl text-gray-700 mt-3 font-serif tracking-widest">Korean Restaurant</p>
+          <h2 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300 tracking-wider">
+            TORI ICHIZU
+          </h2>
+          <div className="h-1.5 w-32 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 mx-auto mt-4 rounded-full shadow-lg"></div>
         </div>
 
-        {/* Animated dots */}
-        <div className="flex justify-center space-x-3 mt-8">
-          <div className="w-3 h-3 bg-emerald-700 rounded-full animate-bounce shadow-lg"></div>
-          <div
-            className="w-3 h-3 bg-green-600 rounded-full animate-bounce shadow-lg"
-            style={{ animationDelay: "150ms" }}
-          ></div>
-          <div
-            className="w-3 h-3 bg-amber-600 rounded-full animate-bounce shadow-lg"
-            style={{ animationDelay: "300ms" }}
-          ></div>
+        {/* Loading animation */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-2 h-8 bg-gradient-to-b from-orange-400 to-yellow-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+          <div className="w-2 h-8 bg-gradient-to-b from-orange-400 to-yellow-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+          <div className="w-2 h-8 bg-gradient-to-b from-orange-400 to-yellow-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
         </div>
 
-        <p className="text-base text-gray-600 mt-6 animate-pulse font-medium">
-          Preparing your authentic Korean experience...
+        {/* Status text */}
+        <p className="text-yellow-300/80 text-sm font-medium tracking-widest">
+          準備中
         </p>
+
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-50px) translateX(15px); opacity: 0; }
+          }
+        `}</style>
       </div>
     </div>
   )

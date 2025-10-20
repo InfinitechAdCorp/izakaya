@@ -17,7 +17,7 @@ export default function FloatingSocialMedia() {
     {
       name: "Instagram",
       icon: Instagram,
-      href: "https://instagram.com/bongarestaurant",
+      href: "https://instagram.com/izakayatoriichizu",
       color: "hover:bg-[#E4405F]",
     },
     {
@@ -29,15 +29,17 @@ export default function FloatingSocialMedia() {
     {
       name: "Call Us",
       icon: Phone,
-      href: "tel:123-BONGA",
-      color: "hover:bg-emerald-600",
+      href: "tel:123-ikazayatoriichizu",
+      color: "hover:bg-orange-600",
     },
   ]
 
   return (
     <div className="fixed right-4 top-1/3 md:top-1/2 md:-translate-y-1/2 z-50 flex flex-col gap-3">
       {/* Social Links - Show/Hide based on isOpen state */}
-      <div className={`flex flex-col gap-3 transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none md:opacity-100 md:translate-y-0 md:pointer-events-auto'}`}>
+      <div
+        className={`flex flex-col gap-3 transition-all duration-300 ${isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none md:opacity-100 md:translate-y-0 md:pointer-events-auto"}`}
+      >
         {socialLinks.map((social, index) => (
           <a
             key={social.name}
@@ -47,12 +49,12 @@ export default function FloatingSocialMedia() {
             className="group"
             aria-label={social.name}
             style={{
-              transitionDelay: isOpen ? `${index * 50}ms` : '0ms'
+              transitionDelay: isOpen ? `${index * 50}ms` : "0ms",
             }}
           >
             <Button
               size="icon"
-              className={`h-12 w-12 rounded-full bg-emerald-700 text-white shadow-lg transition-all duration-300 ${social.color} hover:scale-110 hover:shadow-xl`}
+              className={`h-12 w-12 rounded-full bg-orange-600 text-white shadow-lg transition-all duration-300 ${social.color} hover:scale-110 hover:shadow-xl`}
             >
               <social.icon className="h-5 w-5" />
             </Button>
@@ -64,14 +66,10 @@ export default function FloatingSocialMedia() {
       <Button
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-14 w-14 rounded-full bg-emerald-600 text-white shadow-lg transition-all duration-300 hover:bg-emerald-700 hover:scale-110 hover:shadow-xl md:hidden"
+        className="h-14 w-14 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white shadow-lg transition-all duration-300 hover:from-orange-600 hover:to-yellow-600 hover:scale-110 hover:shadow-xl md:hidden"
         aria-label="Toggle social media links"
       >
-        {isOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <Share2 className="h-6 w-6" />
-        )}
+        {isOpen ? <X className="h-6 w-6" /> : <Share2 className="h-6 w-6" />}
       </Button>
     </div>
   )

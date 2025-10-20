@@ -3,6 +3,9 @@ import { ApiResponse, PaginatedResponse, Order, OrderItem } from '@/types'
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL || ''}/api`
 
 class ApiClient {
+  getReservations() {
+    throw new Error("Method not implemented.")
+  }
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}

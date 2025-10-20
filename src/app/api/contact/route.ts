@@ -61,7 +61,7 @@ export async function GET() {
   return NextResponse.json(
     {
       success: true,
-      message: 'BON GA Restaurant Contact API is running! 연락처 API가 작동 중입니다!',
+      message: 'Izakaya Tori Ichizu Restaurant Contact API is running! 연락처 API가 작동 중입니다!',
       timestamp: new Date().toISOString(),
     },
     { status: 200 }
