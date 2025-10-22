@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -11,7 +12,7 @@ export default function FloatingSocialMedia() {
     {
       name: "Facebook",
       icon: Facebook,
-      href: "https://www.facebook.com/p/The-Bon-Ga-Korean-Restaurant-100065171046073/",
+      href: "https://www.facebook.com/p/Izakaya-Tori-Ichizu-Philippines-61577219897910/",
       color: "hover:bg-[#1877F2]",
     },
     {
@@ -29,7 +30,7 @@ export default function FloatingSocialMedia() {
     {
       name: "Call Us",
       icon: Phone,
-      href: "tel:123-ikazayatoriichizu",
+      href: "tel:283620676",
       color: "hover:bg-orange-600",
     },
   ]

@@ -6,9 +6,9 @@ import ServiceWorkerProvider from "@/components/ServiceWorkerProvider"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Izakaya Tori Ichizu Restaurant - Authentic Korean Cuisine",
+  title: "Izakaya Tori Ichizu Restaurant - Authentic Japanese Cuisine",
   description:
-    "Experience authentic Korean flavors at Izakaya Tori Ichizu Restaurant. Traditional dishes with a modern twist, made with the finest ingredients.",
+    "Experience authentic Japanese flavors at Izakaya Tori Ichizu Restaurant. Traditional dishes with a modern twist, made with the finest ingredients.",
   manifest: "/manifest.json",
 
   appleWebApp: {

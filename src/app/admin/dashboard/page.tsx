@@ -176,31 +176,28 @@ export default function AdminDashboard() {
                 </p>
               </div>
 
-              {analytics.keyMetrics.totalOrders === 0 ? (
+              {!analytics.keyMetrics || analytics.keyMetrics.totalOrders === 0 ? (
                 <div className="space-y-6">
                   <Card className="border-orange-200 bg-white/70 backdrop-blur-sm shadow-xl">
                     <CardHeader>
                       <CardTitle className="text-orange-800 flex items-center gap-2">
-                        🔐 Authentication Required
+                        📊 No Data Available
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-orange-800 mb-2">Orders Data Unavailable</h4>
+                        <h4 className="font-semibold text-orange-800 mb-2">No Orders Found</h4>
                         <p className="text-orange-700 text-sm mb-3">
                           {apiError ||
-                            "Your Laravel orders endpoint requires authentication (auth:sanctum middleware)."}
+                            "There are currently no orders in the system. This could be because the database is empty or the API endpoint requires authentication."}
                         </p>
                         <div className="text-xs text-orange-600 space-y-1">
                           <p>
-                            <strong>Option 1:</strong> Set LARAVEL_API_TOKEN environment variable
+                            <strong>Possible reasons:</strong>
                           </p>
-                          <p>
-                            <strong>Option 2:</strong> Create a public analytics endpoint in Laravel
-                          </p>
-                          <p>
-                            <strong>Option 3:</strong> Remove auth:sanctum from orders route temporarily
-                          </p>
+                          <p>• No orders have been created yet</p>
+                          <p>• Orders were recently deleted</p>
+                          <p>• Authentication required (auth:sanctum middleware)</p>
                         </div>
                       </div>
 
@@ -252,8 +249,8 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                         <CardTitle className="text-sm font-medium text-red-100">Total Revenue</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">₱{analytics.keyMetrics.totalRevenue.toLocaleString()}</div>
-                        <p className="text-xs text-red-100 mt-1">+{analytics.keyMetrics.growthRate}% from last month</p>
+                        <div className="text-2xl font-bold">₱{(analytics.keyMetrics?.totalRevenue || 0).toLocaleString()}</div>
+                        <p className="text-xs text-red-100 mt-1">+{analytics.keyMetrics?.growthRate || 0}% from last month</p>
                       </CardContent>
                     </Card>
 
@@ -262,7 +259,7 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                         <CardTitle className="text-sm font-medium text-orange-100">Total Orders</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{analytics.keyMetrics.totalOrders.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{(analytics.keyMetrics?.totalOrders || 0).toLocaleString()}</div>
                         <p className="text-xs text-orange-100 mt-1">Last 30 days</p>
                       </CardContent>
                     </Card>
@@ -272,17 +269,17 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                         <CardTitle className="text-sm font-medium text-red-100">Avg Order Value</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">₱{analytics.keyMetrics.averageOrderValue}</div>
+                        <div className="text-2xl font-bold">₱{(analytics.keyMetrics?.averageOrderValue || 0).toLocaleString()}</div>
                         <p className="text-xs text-red-100 mt-1">Per order average</p>
                       </CardContent>
                     </Card>
 
-                     <Card className="border-red-200 bg-gradient-to-br from-red-600 to-orange-600 text-white shadow-xl">
+                    <Card className="border-red-200 bg-gradient-to-br from-red-600 to-orange-600 text-white shadow-xl">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-orange-100">Total Customers</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{analytics.keyMetrics.totalCustomers.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{(analytics.keyMetrics?.totalCustomers || 0).toLocaleString()}</div>
                         <p className="text-xs text-orange-100 mt-1">Unique customers</p>
                       </CardContent>
                     </Card>
@@ -296,21 +293,27 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={analytics.revenueData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#fecaca" />
-                          <XAxis dataKey="date" stroke="#dc2626" />
-                          <YAxis stroke="#dc2626" />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "#fef2f2",
-                              border: "1px solid #fecaca",
-                              borderRadius: "8px",
-                            }}
-                          />
-                          <Area type="monotone" dataKey="revenue" stroke="#ef4444" fill="#fecaca" strokeWidth={2} />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      {analytics.revenueData && analytics.revenueData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <AreaChart data={analytics.revenueData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#fecaca" />
+                            <XAxis dataKey="date" stroke="#dc2626" />
+                            <YAxis stroke="#dc2626" />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "#fef2f2",
+                                border: "1px solid #fecaca",
+                                borderRadius: "8px",
+                              }}
+                            />
+                            <Area type="monotone" dataKey="revenue" stroke="#ef4444" fill="#fecaca" strokeWidth={2} />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-[300px] flex items-center justify-center text-gray-500">
+                          No revenue data available
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
 
@@ -321,26 +324,32 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                         <CardDescription className="text-red-600">Current order status breakdown</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <ResponsiveContainer width="100%" height={250}>
-                          <PieChart>
-                            <Pie
-                              data={analytics.orderStatusData}
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={80}
-                              dataKey="count"
-                              label={({ status, percentage }) => `${status} (${percentage}%)`}
-                            >
-                              {analytics.orderStatusData.map((entry, index) => (
-                                <Cell
-                                  key={`cell-${index}`}
-                                  fill={statusColors[entry.status as keyof typeof statusColors]}
-                                />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
+                        {analytics.orderStatusData && analytics.orderStatusData.length > 0 ? (
+                          <ResponsiveContainer width="100%" height={250}>
+                            <PieChart>
+                              <Pie
+                                data={analytics.orderStatusData}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={80}
+                                dataKey="count"
+                                label={({ status, percentage }) => `${status} (${percentage}%)`}
+                              >
+                                {analytics.orderStatusData.map((entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={statusColors[entry.status as keyof typeof statusColors]}
+                                  />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        ) : (
+                          <div className="h-[250px] flex items-center justify-center text-gray-500">
+                            No order status data available
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
 
@@ -350,21 +359,27 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                         <CardDescription className="text-red-600">Payment method preferences</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <ResponsiveContainer width="100%" height={250}>
-                          <BarChart data={analytics.paymentMethodData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#fecaca" />
-                            <XAxis dataKey="method" stroke="#dc2626" />
-                            <YAxis stroke="#dc2626" />
-                            <Tooltip
-                              contentStyle={{
-                                backgroundColor: "#fef2f2",
-                                border: "1px solid #fecaca",
-                                borderRadius: "8px",
-                              }}
-                            />
-                            <Bar dataKey="count" fill="#ef4444" />
-                          </BarChart>
-                        </ResponsiveContainer>
+                        {analytics.paymentMethodData && analytics.paymentMethodData.length > 0 ? (
+                          <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={analytics.paymentMethodData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#fecaca" />
+                              <XAxis dataKey="method" stroke="#dc2626" />
+                              <YAxis stroke="#dc2626" />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: "#fef2f2",
+                                  border: "1px solid #fecaca",
+                                  borderRadius: "8px",
+                                }}
+                              />
+                              <Bar dataKey="count" fill="#ef4444" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        ) : (
+                          <div className="h-[250px] flex items-center justify-center text-gray-500">
+                            No payment method data available
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
@@ -375,37 +390,43 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                       <CardDescription className="text-red-600">Top selling items by order count</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
-                        {analytics.popularProducts.map((product, index) => (
-                          <div
-                            key={product.name}
-                            className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200"
-                          >
-                            <div className="flex items-center space-x-4">
-                              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-500 text-white rounded-full flex items-center justify-center font-bold">
-                                {index + 1}
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-red-800">{product.name}</h3>
-                                <div className="flex items-center space-x-2 mt-1">
-                                  <Badge variant="outline" className="text-xs border-red-300 text-red-700">
-                                    {product.category}
-                                  </Badge>
-                                  {product.is_spicy && (
-                                    <Badge variant="outline" className="text-xs border-orange-300 text-orange-700">
-                                      🌶️ Spicy
+                      {analytics.popularProducts && analytics.popularProducts.length > 0 ? (
+                        <div className="space-y-4">
+                          {analytics.popularProducts.map((product, index) => (
+                            <div
+                              key={product.name}
+                              className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200"
+                            >
+                              <div className="flex items-center space-x-4">
+                                <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-500 text-white rounded-full flex items-center justify-center font-bold">
+                                  {index + 1}
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-red-800">{product.name}</h3>
+                                  <div className="flex items-center space-x-2 mt-1">
+                                    <Badge variant="outline" className="text-xs border-red-300 text-red-700">
+                                      {product.category}
                                     </Badge>
-                                  )}
+                                    {product.is_spicy && (
+                                      <Badge variant="outline" className="text-xs border-orange-300 text-orange-700">
+                                        🌶️ Spicy
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
+                              <div className="text-right">
+                                <div className="font-bold text-red-800">{product.orders} orders</div>
+                                <div className="text-sm text-red-600">₱{product.revenue.toLocaleString()}</div>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <div className="font-bold text-red-800">{product.orders} orders</div>
-                              <div className="text-sm text-red-600">₱{product.revenue.toLocaleString()}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="py-8 text-center text-gray-500">
+                          No popular products data available
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
 
@@ -415,21 +436,27 @@ LARAVEL_API_TOKEN=your-sanctum-token-here`}
                       <CardDescription className="text-red-600">Revenue by product category</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={analytics.categoryData} layout="horizontal">
-                          <CartesianGrid strokeDasharray="3 3" stroke="#fecaca" />
-                          <XAxis type="number" stroke="#dc2626" />
-                          <YAxis dataKey="category" type="category" stroke="#dc2626" />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "#fef2f2",
-                              border: "1px solid #fecaca",
-                              borderRadius: "8px",
-                            }}
-                          />
-                          <Bar dataKey="revenue" fill="#ef4444" />
-                        </BarChart>
-                      </ResponsiveContainer>
+                      {analytics.categoryData && analytics.categoryData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={analytics.categoryData} layout="horizontal">
+                            <CartesianGrid strokeDasharray="3 3" stroke="#fecaca" />
+                            <XAxis type="number" stroke="#dc2626" />
+                            <YAxis dataKey="category" type="category" stroke="#dc2626" />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "#fef2f2",
+                                border: "1px solid #fecaca",
+                                borderRadius: "8px",
+                              }}
+                            />
+                            <Bar dataKey="revenue" fill="#ef4444" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-[300px] flex items-center justify-center text-gray-500">
+                          No category data available
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </>

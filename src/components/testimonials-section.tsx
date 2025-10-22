@@ -94,11 +94,16 @@ export default function TestimonialsSection() {
 
                   {/* Client Info */}
                   <div className="pt-4 border-t border-orange-100">
-                    <p className="font-semibold text-gray-800">{testimonial.client_name}</p>
-                    <p className="text-sm text-gray-600">{testimonial.client_email}</p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {new Date(testimonial.created_at).toLocaleDateString()}
-                    </p>
+                    <p className="text-lg text-gray-800">{testimonial.client_name}</p>
+              
+                   <p className="text-xs text-gray-500 mt-2">
+  {new Date(testimonial.created_at).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })}
+</p>
+
                   </div>
                 </CardContent>
               </Card>

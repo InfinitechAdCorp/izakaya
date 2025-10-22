@@ -7,6 +7,7 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react"
 const Footer = () => {
   const pathname = usePathname()
 
+  // Hide footer in admin routes
   if (pathname.startsWith("/admin")) {
     return null
   }
@@ -50,29 +51,31 @@ const Footer = () => {
             <h3 className="text-lg font-semibold">Contact Info</h3>
             <div className="space-y-2 text-sm">
               <Link
-                href="https://www.google.com/maps/place/REMEDIOS+ST.+MALATE+MANILA+CITY"
+                href="https://www.google.com/maps/place/PISO+PAY.COM+Building/@14.5635978,121.0289417,17z"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 hover:text-orange-400 transition-colors"
               >
                 <MapPin className="h-4 w-4 text-white/60" />
-                <span className="text-white/80">1st Floor, PISO PAY.COM BLDG #47 Polaris St, Bel-air Makati City</span>
+                <span className="text-white/80">
+                  1st Floor, PISO PAY.COM BLDG, #47 Polaris St, Bel-Air, Makati City
+                </span>
               </Link>
 
               <Link
-                href="tel:09777229947"
+                href="tel:(02) 8362 0676"
                 className="flex items-center space-x-2 hover:text-orange-400 transition-colors"
               >
                 <Phone className="h-4 w-4 text-white/60" />
-                <span className="text-white/80">0977 722 9947</span>
+                <span className="text-white/80">(02) 8362 0676</span>
               </Link>
 
               <Link
-                href="mailto:hello@izakayatoriichizu.com"
+                href="mailto:ph.toriichizu01@gmail.com"
                 className="flex items-center space-x-2 hover:text-orange-400 transition-colors"
               >
                 <Mail className="h-4 w-4 text-white/60" />
-                <span className="text-white/80">hello@izakayatoriichizu.com</span>
+                <span className="text-white/80">ph.toriichizu01@gmail.com</span>
               </Link>
             </div>
           </div>

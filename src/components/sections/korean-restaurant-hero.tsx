@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Heart, Users, Award, Flame } from "lucide-react"
 
-export default function KoreanRestaurantHero() {
+export default function JapaneseRestaurantHero() {
   return (
     <section className="relative py-20 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
@@ -17,8 +17,8 @@ export default function KoreanRestaurantHero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl">🇰🇷</span>
-              <span className="text-lg font-medium text-red-600 tracking-wide">AUTHENTIC KOREAN CUISINE</span>
+              <span className="text-3xl">🇯🇵</span>
+              <span className="text-lg font-medium text-red-600 tracking-wide">AUTHENTIC JAPANESE CUISINE</span>
             </div>
 
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
@@ -29,16 +29,15 @@ export default function KoreanRestaurantHero() {
             </h1>
 
             <p className="text-xl text-gray-700 leading-relaxed">
-              Experience the heart of Korea in every bite! Our master chefs bring you
-              <span className="font-semibold text-red-600"> authentic flavors</span> from Seoul's bustling streets to
-              your table. From sizzling Korean BBQ to comforting kimchi jjigae, every dish is crafted with love and
-              tradition.
+              Experience the heart of Japan in every bite! Our master chefs bring you
+              <span className="font-semibold text-red-600"> authentic flavors</span> from Tokyo’s vibrant streets to
+              your table. From sizzling Japanese BBQ to savory ramen, every dish is crafted with passion and tradition.
             </p>
 
             <p className="text-lg text-gray-600 leading-relaxed">
-              🥢 <span className="font-medium">Saranghae Korean Food!</span> Join our family and discover why we're the
-              most beloved Korean restaurant in town. Fresh ingredients, traditional recipes, and that special Korean
-              hospitality await you!
+              🍱 <span className="font-medium">Arigatou for loving Japanese food!</span> Join our family and discover why
+              we’re the most beloved Japanese restaurant in town. Fresh ingredients, traditional recipes, and that warm
+              Japanese hospitality await you!
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -68,7 +67,7 @@ export default function KoreanRestaurantHero() {
                   <Flame className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-2 text-gray-800">Authentic Flavors</h3>
-                <p className="text-sm text-gray-600">Traditional Korean recipes from Seoul</p>
+                <p className="text-sm text-gray-600">Traditional Japanese recipes from Tokyo</p>
               </CardContent>
             </Card>
 
@@ -78,7 +77,7 @@ export default function KoreanRestaurantHero() {
                   <Heart className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-2 text-gray-800">Made with Love</h3>
-                <p className="text-sm text-gray-600">Every dish crafted with Korean heart</p>
+                <p className="text-sm text-gray-600">Every dish crafted with Japanese passion</p>
               </CardContent>
             </Card>
 
@@ -88,7 +87,7 @@ export default function KoreanRestaurantHero() {
                   <Users className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-2 text-gray-800">Family Atmosphere</h3>
-                <p className="text-sm text-gray-600">Warm Korean hospitality & community</p>
+                <p className="text-sm text-gray-600">Warm Japanese hospitality & community</p>
               </CardContent>
             </Card>
 
@@ -98,7 +97,7 @@ export default function KoreanRestaurantHero() {
                   <Award className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-2 text-gray-800">Award Winning</h3>
-                <p className="text-sm text-gray-600">Best Korean restaurant 3 years running</p>
+                <p className="text-sm text-gray-600">Best Japanese restaurant 3 years running</p>
               </CardContent>
             </Card>
           </div>

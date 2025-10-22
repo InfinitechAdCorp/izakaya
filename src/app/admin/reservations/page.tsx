@@ -1,15 +1,13 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
-import { Trash2, Edit2, Plus } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -32,9 +30,9 @@ type ReservationStatus = "pending" | "confirmed" | "cancelled"
 export default function ReservationsAdmin() {
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
-  const [isAdding, setIsAdding] = useState(false)
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const { toast } = useToast()
+  const [currentDate, setCurrentDate] = useState(new Date())
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
+  const [isAddingReservation, setIsAddingReservation] = useState(false)
   const isMobile = useIsMobile()
 
   const [formData, setFormData] = useState({
@@ -52,27 +50,148 @@ export default function ReservationsAdmin() {
     fetchReservations()
   }, [])
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  useEffect(() => {
+    if (reservations.length > 0) {
+      console.log("✅ Loaded reservations:", reservations.length)
+      console.log("Sample reservation:", reservations[0])
+    }
+  }, [reservations])
 
+  function getAuthHeaders() {
+    const token = localStorage.getItem('auth_token')
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    }
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`
+    }
+    return headers
+  }
+
+  async function fetchReservations() {
     try {
-      const url = editingId ? `/api/reservations/${editingId}` : "/api/reservations"
-      const method = editingId ? "PUT" : "POST"
+      setLoading(true)
+      const response = await fetch("/api/reservations", {
+        headers: getAuthHeaders()
+      })
+      
+      console.log("Response status:", response.status)
+      
+      if (!response.ok) throw new Error("Failed to fetch")
+      
+      const data = await response.json()
+      console.log("Raw API Response:", data)
+      
+      let reservationList = []
+      
+      if (data.success && data.data && Array.isArray(data.data)) {
+        reservationList = data.data
+      } else if (Array.isArray(data)) {
+        reservationList = data
+      } else if (data.data && Array.isArray(data.data)) {
+        reservationList = data.data
+      }
+      
+      console.log("✅ Loaded reservations:", reservationList.length)
+      if (reservationList.length > 0) {
+        console.log("Sample reservation:", reservationList[0])
+      }
+      
+      setReservations(reservationList)
+    } catch (error) {
+      console.error("Error fetching reservations:", error)
+      setReservations([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
+  function getDaysInMonth(date: Date) {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+    const daysInMonth = lastDay.getDate()
+    const startingDayOfWeek = firstDay.getDay()
+    
+    const days = []
+    
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null)
+    }
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day))
+    }
+    
+    return days
+  }
+
+  function getReservationsForDate(date: Date | null) {
+    if (!date) return []
+    
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const dateStr = `${year}-${month}-${day}`
+    
+    const found = reservations.filter(res => {
+      const resDate = res.date.substring(0, 10)
+      return resDate === dateStr
+    })
+    
+    return found
+  }
+
+  function previousMonth() {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))
+  }
+
+  function nextMonth() {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))
+  }
+
+  function goToToday() {
+    setCurrentDate(new Date())
+  }
+
+  function formatMonthYear(date: Date) {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  }
+
+  function isToday(date: Date | null) {
+    if (!date) return false
+    const today = new Date()
+    return date.toDateString() === today.toDateString()
+  }
+
+  function formatDate(dateString: string) {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
+  }
+
+  function formatTime(timeString: string) {
+    const [hours, minutes] = timeString.split(':')
+    const hour = parseInt(hours)
+    const minute = minutes || '00'
+    const period = hour >= 12 ? 'PM' : 'AM'
+    const displayHour = hour % 12 || 12
+    return `${displayHour}:${minute}${period}`
+  }
+
+  async function handleCreateReservation() {
+    try {
+      const response = await fetch("/api/reservations", {
+        method: "POST",
+        headers: getAuthHeaders(),
         body: JSON.stringify(formData),
       })
 
-      if (!response.ok) throw new Error("Failed to save")
-
-      toast({
-        title: "Success",
-        description: editingId ? "Reservation updated successfully" : "Reservation created successfully",
-      })
+      if (!response.ok) throw new Error("Failed to create reservation")
 
       setFormData({
         name: "",
@@ -84,78 +203,52 @@ export default function ReservationsAdmin() {
         special_requests: "",
         status: "pending",
       })
-      setEditingId(null)
-      setIsAdding(false)
+      setIsAddingReservation(false)
       fetchReservations()
     } catch (error) {
-      console.error("Error saving reservation:", error)
-      toast({
-        title: "Error",
-        description: "Failed to save reservation",
-        variant: "destructive",
-      })
+      console.error("Error creating reservation:", error)
     }
   }
 
   async function handleDelete(id: number) {
-    if (!confirm("Are you sure?")) return
+    if (!confirm("Are you sure you want to delete this reservation?")) return
 
     try {
       const response = await fetch(`/api/reservations/${id}`, {
         method: "DELETE",
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) throw new Error("Failed to delete")
 
-      toast({
-        title: "Success",
-        description: "Reservation deleted successfully",
-      })
-
+      setSelectedReservation(null)
       fetchReservations()
     } catch (error) {
       console.error("Error deleting reservation:", error)
-      toast({
-        title: "Error",
-        description: "Failed to delete reservation",
-        variant: "destructive",
-      })
     }
   }
 
-  function handleEdit(reservation: Reservation) {
-    setFormData({
-      name: reservation.name,
-      email: reservation.email,
-      phone: reservation.phone,
-      date: reservation.date,
-      time: reservation.time,
-      guests: reservation.guests,
-      special_requests: reservation.special_requests || "",
-      status: reservation.status,
-    })
-    setEditingId(reservation.id)
-    setIsAdding(true)
-  }
-
-  async function fetchReservations() {
+  async function handleStatusChange(id: number, newStatus: ReservationStatus) {
     try {
-      setLoading(true)
-      const response = await fetch("/api/reservations")
-      if (!response.ok) throw new Error("Failed to fetch")
-      const data = await response.json()
-      setReservations(data)
-    } catch (error) {
-      console.error("Error fetching reservations:", error)
-      toast({
-        title: "Error",
-        description: "Failed to fetch reservations",
-        variant: "destructive",
+      const response = await fetch(`/api/reservations/${id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: newStatus }),
       })
-    } finally {
-      setLoading(false)
+
+      if (!response.ok) throw new Error("Failed to update")
+
+      fetchReservations()
+      if (selectedReservation?.id === id) {
+        setSelectedReservation({ ...selectedReservation, status: newStatus })
+      }
+    } catch (error) {
+      console.error("Error updating status:", error)
     }
   }
+
+  const days = getDaysInMonth(currentDate)
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   if (loading) {
     return <div className="p-8">Loading...</div>
@@ -167,158 +260,221 @@ export default function ReservationsAdmin() {
       <div className="flex-1">
         <div className="flex items-center gap-2 p-4 border-b">
           <SidebarTrigger />
-          <h1 className="text-lg font-semibold">Reservations</h1>
+          <h1 className="text-lg font-semibold">Reservations Calendar</h1>
         </div>
-        <div className="p-8 max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">Reservations</h1>
-            <Button
-              onClick={() => {
-                setIsAdding(!isAdding)
-                if (isAdding) {
-                  setFormData({
-                    name: "",
-                    email: "",
-                    phone: "",
-                    date: "",
-                    time: "",
-                    guests: 1,
-                    special_requests: "",
-                    status: "pending",
-                  })
-                  setEditingId(null)
-                }
-              }}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              {isAdding ? "Cancel" : "Add Reservation"}
-            </Button>
+        
+        <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold">{formatMonthYear(currentDate)}</h2>
+              <Button variant="outline" size="sm" onClick={goToToday}>
+                Today
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button variant="outline" size="icon" onClick={previousMonth}>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={nextMonth}>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              <Button onClick={() => setIsAddingReservation(true)} className="flex-1 sm:flex-none">
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">New Reservation</span>
+                <span className="sm:hidden">New</span>
+              </Button>
+            </div>
           </div>
 
-          {isAdding && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>{editingId ? "Edit Reservation" : "Create New Reservation"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <Input
-                    placeholder="Name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                  />
-                  <Input
-                    placeholder="Phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    required
-                  />
-                  <div className="grid grid-cols-3 gap-4">
-                    <Input
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      required
-                    />
-                    <Input
-                      type="time"
-                      value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      required
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Guests"
-                      min="1"
-                      max="20"
-                      value={formData.guests}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          guests: Number.parseInt(e.target.value),
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                  <Textarea
-                    placeholder="Special Requests"
-                    value={formData.special_requests}
-                    onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-                    rows={3}
-                  />
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value: ReservationStatus) => setFormData({ ...formData, status: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button type="submit" className="w-full">
-                    {editingId ? "Update Reservation" : "Create Reservation"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-
-          <div className="grid gap-4">
-            {reservations.map((reservation) => (
-              <Card key={reservation.id}>
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg">{reservation.name}</h3>
-                      <p className="text-sm text-gray-600">{reservation.email}</p>
-                      <p className="text-sm text-gray-600">{reservation.phone}</p>
-                      <div className="flex gap-4 mt-2 text-sm">
-                        <span>
-                          {reservation.date} at {reservation.time}
-                        </span>
-                        <span>Guests: {reservation.guests}</span>
-                      </div>
-                      {reservation.special_requests && (
-                        <p className="text-sm mt-2">Requests: {reservation.special_requests}</p>
-                      )}
-                      <span
-                        className={`inline-block mt-2 px-2 py-1 text-xs rounded ${
-                          reservation.status === "confirmed"
-                            ? "bg-green-100 text-green-800"
-                            : reservation.status === "cancelled"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {reservation.status}
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(reservation)}>
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(reservation.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
+            {weekDays.map(day => (
+              <div key={day} className="p-1 sm:p-2 text-center font-semibold text-xs sm:text-sm text-gray-600">
+                <span className="hidden sm:inline">{day}</span>
+                <span className="sm:hidden">{day.substring(0, 1)}</span>
+              </div>
             ))}
+
+            {days.map((date, index) => {
+              const dayReservations = getReservationsForDate(date)
+              
+              return (
+                <Card
+                  key={index}
+                  className={`min-h-[80px] sm:min-h-[100px] lg:min-h-[120px] ${!date ? 'invisible' : ''} ${
+                    isToday(date) ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                >
+                  <CardContent className="p-1 sm:p-2">
+                    {date && (
+                      <>
+                        <div className="text-xs sm:text-sm font-semibold mb-1 sm:mb-2 text-gray-700">
+                          {date.getDate()}
+                        </div>
+                        <div className="space-y-0.5 sm:space-y-1">
+                          {dayReservations.map(reservation => (
+                            <button
+                              key={reservation.id}
+                              onClick={() => setSelectedReservation(reservation)}
+                              className="w-full text-left px-1 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs truncate transition-colors bg-green-100 hover:bg-green-200 text-green-800 font-medium"
+                            >
+                              <span className="hidden sm:inline">{reservation.time.substring(0, 5)} - </span>
+                              {reservation.name}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
+
+          <Dialog open={!!selectedReservation} onOpenChange={() => setSelectedReservation(null)}>
+            <DialogContent className="max-w-[95vw] sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Reservation Details</DialogTitle>
+              </DialogHeader>
+              {selectedReservation && (
+                <div className="space-y-3 sm:space-y-4 max-h-[70vh] overflow-y-auto">
+                  <div>
+                    <label className="text-xs sm:text-sm font-semibold text-gray-600">Name</label>
+                    <p className="text-base sm:text-lg">{selectedReservation.name}</p>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs sm:text-sm font-semibold text-gray-600">Email</label>
+                    <p className="text-sm sm:text-base break-all">{selectedReservation.email}</p>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs sm:text-sm font-semibold text-gray-600">Phone</label>
+                    <p className="text-sm sm:text-base">{selectedReservation.phone}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <label className="text-xs sm:text-sm font-semibold text-gray-600">Date</label>
+                      <p className="text-sm sm:text-base">{formatDate(selectedReservation.date)}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs sm:text-sm font-semibold text-gray-600">Time</label>
+                      <p className="text-sm sm:text-base">{formatTime(selectedReservation.time)}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs sm:text-sm font-semibold text-gray-600">Guests</label>
+                    <p className="text-sm sm:text-base">{selectedReservation.guests} people</p>
+                  </div>
+                  
+                  {selectedReservation.special_requests && (
+                    <div>
+                      <label className="text-xs sm:text-sm font-semibold text-gray-600">Special Requests</label>
+                      <p className="text-xs sm:text-sm">{selectedReservation.special_requests}</p>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <label className="text-xs sm:text-sm font-semibold text-gray-600 block mb-2">Status</label>
+                    <Select
+                      value={selectedReservation.status}
+                      onValueChange={(value: ReservationStatus) =>
+                        handleStatusChange(selectedReservation.id, value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={() => handleDelete(selectedReservation.id)}
+                  >
+                    Delete Reservation
+                  </Button>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isAddingReservation} onOpenChange={setIsAddingReservation}>
+            <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Create New Reservation</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3 sm:space-y-4">
+                <Input
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+                <Input
+                  placeholder="Phone"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <Input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  />
+                  <Input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                  />
+                </div>
+                <Input
+                  type="number"
+                  placeholder="Number of Guests"
+                  min="1"
+                  max="20"
+                  value={formData.guests}
+                  onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
+                />
+                <Textarea
+                  placeholder="Special Requests (Optional)"
+                  value={formData.special_requests}
+                  onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
+                  rows={3}
+                />
+                <Select
+                  value={formData.status}
+                  onValueChange={(value: ReservationStatus) =>
+                    setFormData({ ...formData, status: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleCreateReservation} className="w-full">
+                  Create Reservation
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </SidebarProvider>

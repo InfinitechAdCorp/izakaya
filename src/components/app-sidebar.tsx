@@ -79,7 +79,7 @@ const items = [
       },
       {
         title: "Blog Posts",
-        url: "/admin/blog-posts",
+        url: "/admin/blog",
       },
       {
         title: "Testimonials",
