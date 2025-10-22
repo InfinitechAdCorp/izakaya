@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   ChevronRight,
   Users,
@@ -12,7 +12,15 @@ import {
   MessageSquare,
   CheckCircle,
   AlertCircle,
+  Shield,
 } from "lucide-react"
+
+// Use existing Window interface - no need to redeclare
+declare global {
+  interface Window {
+    onRecaptchaLoad?: () => void
+  }
+}
 
 export default function ReservationsPage() {
   const [step, setStep] = useState(1)
@@ -28,6 +36,9 @@ export default function ReservationsPage() {
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
+  const [recaptchaToken, setRecaptchaToken] = useState("")
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
+  const recaptchaRef = useRef<number | null>(null)
 
   // Check if user is logged in and pre-fill form
   useEffect(() => {
@@ -36,7 +47,6 @@ export default function ReservationsPage() {
       try {
         const parsedUser = JSON.parse(userData)
         setUser(parsedUser)
-        // Pre-fill form with user data
         setFormData((prev) => ({
           ...prev,
           name: parsedUser.name || "",
@@ -48,6 +58,62 @@ export default function ReservationsPage() {
       }
     }
   }, [])
+
+  // Load reCAPTCHA script
+  useEffect(() => {
+    const loadRecaptcha = () => {
+      if (window.grecaptcha) {
+        setRecaptchaLoaded(true)
+        return
+      }
+
+      window.onRecaptchaLoad = () => {
+        setRecaptchaLoaded(true)
+      }
+
+      const script = document.createElement("script")
+      script.src = "https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit"
+      script.async = true
+      script.defer = true
+      document.body.appendChild(script)
+    }
+
+    loadRecaptcha()
+
+    return () => {
+      if (recaptchaRef.current !== null && window.grecaptcha) {
+        try {
+          window.grecaptcha.reset(recaptchaRef.current)
+        } catch (e) {
+          console.error("Error resetting recaptcha:", e)
+        }
+      }
+    }
+  }, [])
+
+  // Render reCAPTCHA when on step 4 and script is loaded
+  useEffect(() => {
+    if (step === 4 && recaptchaLoaded && window.grecaptcha) {
+      setTimeout(() => {
+        const container = document.getElementById("recaptcha-container")
+        if (container && !container.hasChildNodes()) {
+          try {
+            recaptchaRef.current = window.grecaptcha.render("recaptcha-container", {
+              sitekey: "6LfqwPIrAAAAAPLhnsOuUTFwddCB0pzqcvy_4Nid",
+              callback: (token: string) => {
+                setRecaptchaToken(token)
+              },
+              "expired-callback": () => {
+                setRecaptchaToken("")
+              },
+            } as any)
+          } catch (error) {
+            console.error("Error rendering recaptcha:", error)
+          }
+        }
+      }, 100)
+    }
+  }, [step, recaptchaLoaded])
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target
@@ -63,13 +129,18 @@ export default function ReservationsPage() {
       case 3:
         return formData.date !== "" && formData.time !== ""
       case 4:
-        return true
+        return recaptchaToken !== ""
       default:
         return false
     }
   }
 
   const handleSubmit = async () => {
+    if (!recaptchaToken) {
+      setMessage("Please complete the reCAPTCHA verification")
+      return
+    }
+
     setLoading(true)
     setMessage("")
 
@@ -80,6 +151,7 @@ export default function ReservationsPage() {
       console.log("User:", user)
       console.log("Token exists:", !!token)
       console.log("Form Data:", formData)
+      console.log("reCAPTCHA Token:", recaptchaToken)
 
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -93,11 +165,13 @@ export default function ReservationsPage() {
         console.warn("No auth token found in localStorage")
       }
 
-      // Call your Next.js API route (not Laravel directly)
       const response = await fetch("/api/reservations", {
         method: "POST",
         headers,
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptcha_token: recaptchaToken,
+        }),
       })
 
       console.log("Response status:", response.status)
@@ -111,7 +185,6 @@ export default function ReservationsPage() {
 
       setMessage("success")
 
-      // Reset form after 3 seconds
       setTimeout(() => {
         setStep(1)
         setFormData({
@@ -123,11 +196,21 @@ export default function ReservationsPage() {
           guests: "2",
           special_requests: "",
         })
+        setRecaptchaToken("")
         setMessage("")
+
+        if (recaptchaRef.current !== null && window.grecaptcha) {
+          window.grecaptcha.reset(recaptchaRef.current)
+        }
       }, 3000)
     } catch (error) {
       console.error("Reservation error:", error)
       setMessage("error")
+
+      if (recaptchaRef.current !== null && window.grecaptcha) {
+        window.grecaptcha.reset(recaptchaRef.current)
+      }
+      setRecaptchaToken("")
     } finally {
       setLoading(false)
     }
@@ -440,6 +523,20 @@ export default function ReservationsPage() {
                       />
                     </div>
                   </div>
+
+                  {/* reCAPTCHA */}
+                  <div className="mt-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-orange-500" />
+                      Security Verification *
+                    </label>
+                    <div id="recaptcha-container" className="flex justify-center" />
+                    {!recaptchaToken && step === 4 && (
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Please complete the reCAPTCHA to continue
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -451,6 +548,15 @@ export default function ReservationsPage() {
                 <div>
                   <p className="font-semibold text-red-900">Something went wrong</p>
                   <p className="text-red-700 text-sm">Please check your information and try again</p>
+                </div>
+              </div>
+            )}
+
+            {message && message !== "success" && message !== "error" && (
+              <div className="mt-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-xl flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-yellow-900 text-sm">{message}</p>
                 </div>
               </div>
             )}
@@ -480,7 +586,7 @@ export default function ReservationsPage() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={loading}
+                  disabled={loading || !isStepValid()}
                   className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-300 text-white font-semibold py-3 px-6 rounded-xl transition-all disabled:cursor-not-allowed"
                 >
                   {loading ? "Confirming..." : "Confirm Reservation"}
