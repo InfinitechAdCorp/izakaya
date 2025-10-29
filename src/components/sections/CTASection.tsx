@@ -43,7 +43,7 @@ export default function CTASection() {
 
         <div className="mt-8 text-white/70 text-sm">
           <span className="inline-block mx-2">🇯🇵</span>
-          <span>Authentic Japanese Cuisine Since 2018</span>
+          <span>Serving Authentic Japanese Flavors</span>
           <span className="inline-block mx-2">🇯🇵</span>
         </div>
       </div>

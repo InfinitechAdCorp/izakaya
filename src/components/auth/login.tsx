@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/toaster"
+import { useAuthStore } from "@/store/authStore"
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -20,6 +21,9 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
+  
+  // Get the login function from auth store
+  const login = useAuthStore((state) => state.login)
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -52,36 +56,29 @@ export default function LoginPage() {
         const token = data.token || data.data?.token || data.access_token
         const user = data.user || data.data?.user || data.data
 
-        if (token) {
-          localStorage.setItem("auth_token", token)
+        if (token && user) {
+          // Just call login - it handles all storage automatically (localStorage, cookies, Zustand)
+          login({ ...user, token })
+          
+          toast.success("Login Successful!", {
+            description: "Welcome back to Izakaya Tori Ichizu!",
+          })
+
+          const userRole = user?.role?.toLowerCase?.() || user?.role || ""
+          const isAdmin = userRole === "admin"
+          const isCustomer = userRole === "customer" || userRole === "user"
+
+          let redirectPath = "/"
+          if (isAdmin) {
+            redirectPath = "/admin/dashboard"
+          } else if (isCustomer) {
+            redirectPath = "/"
+          }
+
+          setTimeout(() => {
+            router.push(redirectPath)
+          }, 1500)
         }
-
-        if (user) {
-          localStorage.setItem("user_data", JSON.stringify(user))
-        }
-
-        window.dispatchEvent(new CustomEvent("userDataUpdated"))
-
-        toast.success("Login Successful!", {
-          description: "Welcome back to Izakaya Tori Ichizu!",
-        })
-
-        const userRole = user?.role?.toLowerCase?.() || user?.role || ""
-        const isAdmin = userRole === "admin"
-        const isCustomer = userRole === "customer" || userRole === "user"
-
-        let redirectPath = "/"
-        if (isAdmin) {
-          redirectPath = "/admin/dashboard"
-        } else if (isCustomer) {
-          redirectPath = "/"
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 100))
-
-        setTimeout(() => {
-          router.push(redirectPath)
-        }, 1500)
       } else {
         toast.error("Login Failed", {
           description: data.message || "Login failed. Please try again.",

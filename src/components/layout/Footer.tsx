@@ -81,7 +81,7 @@ const Footer = () => {
           </div>
 
           {/* Hours */}
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <h3 className="text-lg font-semibold">Hours</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center space-x-2">
@@ -89,13 +89,24 @@ const Footer = () => {
                 <span className="text-white/80">Open 24 Hours</span>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Footer Bottom */}
-        <div className="border-t border-white/20 mt-8 pt-8 text-center">
+        <div className="border-t border-white/20 mt-8 pt-8 text-center space-y-2">
           <p className="text-white/60 text-sm">
-            © 2025 Izakaya Tori Ichizu. All rights reserved. Made with ❤️ for Japanese food lovers.
+            © 2025 Izakaya Tori Ichizu. All rights reserved.
+          </p>
+          <p className="text-white/50 text-xs">
+            Powered by:{" "}
+            <Link
+              href="https://infinitechphil.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-orange-400 transition-colors"
+            >
+              Infinitech Advertising Corporation
+            </Link>
           </p>
         </div>
       </div>

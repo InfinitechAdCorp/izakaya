@@ -21,7 +21,6 @@ export const useCartStore = create<CartStore>()(
         const items = get().items
         const existingItem = items.find((cartItem) => cartItem.id === item.id)
 
-        // Normalize image before storing
         const normalizedImage =
           typeof item.image === "string" ? item.image : (item.image as any)?.src || "/placeholder.svg"
 
@@ -68,7 +67,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "Izakaya Tori Ichizu-cart-storage",
+      name: "restaurant-cart-storage",
     },
   ),
 )

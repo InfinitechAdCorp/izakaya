@@ -1,12 +1,18 @@
-
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import { Facebook, Instagram, MessageCircle, Phone, Share2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function FloatingSocialMedia() {
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
+
+  // Hide on login and registration pages
+  if (pathname === "/login" || pathname === "/register") {
+    return null
+  }
 
   const socialLinks = [
     {
@@ -18,13 +24,13 @@ export default function FloatingSocialMedia() {
     {
       name: "Instagram",
       icon: Instagram,
-      href: "https://instagram.com/izakayatoriichizu",
+      href: "https://www.instagram.com/izakaya.tori/",
       color: "hover:bg-[#E4405F]",
     },
     {
       name: "WhatsApp",
       icon: MessageCircle,
-      href: "https://wa.me/1234567890",
+      href: "https://wa.me/283620676",
       color: "hover:bg-[#25D366]",
     },
     {
@@ -36,7 +42,7 @@ export default function FloatingSocialMedia() {
   ]
 
   return (
-    <div className="fixed right-4 top-1/3 md:top-1/2 md:-translate-y-1/2 z-50 flex flex-col gap-3">
+    <div className="fixed right-4 bottom-24 md:top-1/2 md:bottom-auto md:-translate-y-1/2 z-30 flex flex-col gap-4">
       {/* Social Links - Show/Hide based on isOpen state */}
       <div
         className={`flex flex-col gap-3 transition-all duration-300 ${isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none md:opacity-100 md:translate-y-0 md:pointer-events-auto"}`}

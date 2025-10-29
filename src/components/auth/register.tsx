@@ -29,6 +29,12 @@ export default function RegisterPage() {
   const router = useRouter()
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
+    // Phone number validation: only accept numbers
+    if (field === "phone") {
+      const numbersOnly = value.replace(/\D/g, "")
+      setFormData((prev) => ({ ...prev, [field]: numbersOnly }))
+      return
+    }
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -56,6 +62,13 @@ export default function RegisterPage() {
       return
     }
 
+    if (formData.phone && formData.phone.length !== 11) {
+      toast.error("Invalid Phone Number", {
+        description: "Phone number must be exactly 11 digits.",
+      })
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -70,11 +83,9 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (data.success) {
-        localStorage.setItem("auth_token", data.data.token)
-        localStorage.setItem("user_data", JSON.stringify(data.data.user))
-
         toast.success("Registration Successful!", {
-          description: "Welcome to Izakaya Tori Ichizu!",
+          description: "Please check your email to verify your account.",
+          duration: 5000,
         })
 
         setTimeout(() => {
@@ -159,7 +170,8 @@ export default function RegisterPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
-                    placeholder="input your phone number"
+                    placeholder="09123456789 (11 digits)"
+                    maxLength={11}
                     className="border-2 border-orange-300 bg-white text-black placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-400/30 h-12 text-base"
                     disabled={isSubmitting}
                   />

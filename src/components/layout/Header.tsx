@@ -145,14 +145,33 @@ const Header = () => {
         <div className="flex items-center justify-between h-14 sm:h-16 md:h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
-            <div className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-              <Image src="/logo.png" alt="Izakaya Tori Ichizu Logo" fill className="object-contain" />
-            </div>
-            <div className="flex flex-col hidden sm:flex">
-              <span className="text-lg sm:text-base md:text-lg font-bold text-gray-800 leading-tight">Izakaya </span>
-              <span className="text-md text-orange-600 font-medium -mt-0.5">Tori Ichizu</span>
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 overflow-hidden shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+              <Image
+                src="/logonew.png"
+                alt="Izakaya Tori Ichizu Logo"
+                fill
+                className="object-contain"
+              />
             </div>
           </Link>
+
+          {/* Mobile Quick Nav Icons - Show only on mobile, hide on desktop */}
+          <div className="flex lg:hidden items-center gap-2 ml-2">
+            {mainNav.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`p-2 rounded-lg transition-all duration-300 ${
+                  isActivePage(item.href)
+                    ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-md"
+                    : "text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                }`}
+                title={item.name}
+              >
+                <item.icon className="h-5 w-5" />
+              </Link>
+            ))}
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-1">
@@ -311,7 +330,7 @@ const Header = () => {
                 <div className="flex flex-col h-full">
                   {/* Mobile Menu Header */}
                   <div className="flex items-center space-x-3 p-4 border-b border-gray-100">
-                    <div className="relative w-10 h-10 rounded-lg overflow-hidden shadow-md flex-shrink-0">
+                    <div className="relative w-12 h-12 overflow-hidden shadow-md flex-shrink-0">
                       <Image src="/logo.png" alt="Izakaya Logo" fill className="object-contain" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -369,17 +388,6 @@ const Header = () => {
                         Quick Actions
                       </h3>
                       <div className="space-y-2 px-2">
-                        <Link href="/cart" onClick={() => setIsOpen(false)} className="block">
-                          <div className="flex items-center justify-between px-3 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                            <div className="flex items-center space-x-3">
-                              <ShoppingCart className="h-5 w-5 flex-shrink-0" />
-                              <span className="font-medium text-sm">View Cart</span>
-                            </div>
-                            {itemCount > 0 && (
-                              <Badge className="bg-orange-600 text-white px-2 py-1 text-xs">{itemCount}</Badge>
-                            )}
-                          </div>
-                        </Link>
                         <div className="px-3 py-3">
                           <EventBookingModal />
                         </div>

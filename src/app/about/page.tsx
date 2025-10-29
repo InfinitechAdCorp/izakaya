@@ -36,7 +36,7 @@ const About = () => {
             </h2>
             <div className="space-y-4 text-lg text-yellow-200/80 leading-relaxed">
               <p>
-                Founded in 2018, Izakaya Tori Ichizu began as a small family dream to share the authentic flavors of
+                Founded in 2025, Izakaya Tori Ichizu began as a small family dream to share the authentic flavors of
                 Japan with our community. What started as a humble kitchen has grown into a beloved dining destination
                 for Japanese food enthusiasts.
               </p>
@@ -88,7 +88,7 @@ const About = () => {
                 <Clock className="w-12 h-12 text-orange-500 mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="font-semibold text-lg mb-2 text-yellow-300 leading-tight">6 Years</h3>
                 <p className="text-sm text-yellow-200/80 leading-relaxed max-w-[180px]">
-                  Serving the community since 2018
+                  Serving the community since 2025
                 </p>
               </CardContent>
             </Card>

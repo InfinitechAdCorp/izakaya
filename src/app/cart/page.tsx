@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Minus, Plus, X, ShoppingBag } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
@@ -223,10 +223,10 @@ const Cart = () => {
             </div>
 
             <div className="lg:w-96">
-              <Card className="sticky top-24 backdrop-blur-sm bg-white/98 border-orange-200 rounded-2xl shadow-lg">
-                <CardHeader className="bg-orange-600 text-white rounded-t-2xl py-0">
-                  <CardTitle className="text-xl flex items-center gap-2 p-4">🍱 Order Summary</CardTitle>
-                </CardHeader>
+              <Card className="sticky top-24 backdrop-blur-sm bg-white/98 border-orange-200 rounded-2xl shadow-lg overflow-hidden p-0">
+                <div className="bg-orange-600 text-white px-6 py-4">
+                  <h2 className="text-xl font-semibold flex items-center gap-2">🍱 Order Summary</h2>
+                </div>
                 <CardContent className="space-y-4 p-6">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">

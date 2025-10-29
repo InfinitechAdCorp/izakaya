@@ -6,17 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { useCartStore } from "@/store/cartStore"
 import type { CheckoutInfo } from "@/types"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
-import { Smartphone, Building2, Wallet, Banknote, FileText, Lock, Package, LogIn, X, TruckIcon } from "lucide-react"
+import { Banknote, Lock, Package, LogIn, TruckIcon } from "lucide-react"
 import Link from "next/link"
 
 interface ExtendedCheckoutInfo extends Omit<CheckoutInfo, "paymentMethod"> {
-  paymentMethod: "cash" | "gcash" | "paypal" | "bpi" | "maya"
+  paymentMethod: "cash"
   notes?: string
 }
 
@@ -33,8 +32,6 @@ const Checkout = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   const router = useRouter()
   const [isOrderComplete, setIsOrderComplete] = useState(false)
-  const [receiptFile, setReceiptFile] = useState<File | null>(null)
-  const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
   const [userInfo, setUserInfo] = useState<any | null>(null)
   const [isLoadingUser, setIsLoadingUser] = useState(true)
 
@@ -148,31 +145,6 @@ const Checkout = () => {
     }
   }
 
-  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setReceiptFile(file)
-      const previewUrl = URL.createObjectURL(file)
-      setReceiptPreview(previewUrl)
-      toast({
-        title: "Receipt Uploaded",
-        description: `Receipt "${file.name}" has been uploaded successfully.`,
-      })
-    }
-  }
-
-  const handleRemoveReceipt = () => {
-    if (receiptPreview) {
-      URL.revokeObjectURL(receiptPreview)
-    }
-    setReceiptFile(null)
-    setReceiptPreview(null)
-    toast({
-      title: "Receipt Removed",
-      description: "Receipt has been removed.",
-    })
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -217,7 +189,6 @@ const Checkout = () => {
         customer_name: checkoutInfo.name,
         customer_email: checkoutInfo.email,
         customer_phone: checkoutInfo.phone,
-        receipt_file: receiptFile ? receiptFile.name : "",
         notes: checkoutInfo.notes || "",
       }
 
@@ -322,10 +293,10 @@ const Checkout = () => {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="bg-white/98 backdrop-blur-md border-orange-200 shadow-lg rounded-2xl">
-              <CardHeader className="border-b border-orange-200 bg-orange-600 text-white rounded-t-2xl py-0">
-                <CardTitle className="text-xl p-4">Delivery & Payment Information</CardTitle>
-              </CardHeader>
+            <Card className="bg-white/98 backdrop-blur-md border-orange-200 shadow-lg rounded-2xl overflow-hidden p-0">
+              <div className="border-b border-orange-200 bg-orange-600 text-white px-6 py-4">
+                <h2 className="text-xl font-semibold">Delivery & Payment Information</h2>
+              </div>
               <CardContent className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-4">
@@ -442,116 +413,13 @@ const Checkout = () => {
                       Payment Method
                     </h3>
 
-                    <RadioGroup
-                      value={checkoutInfo.paymentMethod}
-                      onValueChange={(value) =>
-                        handleInputChange("paymentMethod", value as ExtendedCheckoutInfo["paymentMethod"])
-                      }
-                      className="grid grid-cols-2 gap-3"
-                    >
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-400 transition-colors">
-                        <RadioGroupItem value="gcash" id="gcash" className="border-orange-500 text-orange-600" />
-                        <Label htmlFor="gcash" className="text-gray-700 cursor-pointer flex items-center gap-2">
-                          <Smartphone className="w-4 h-4" /> GCash
-                        </Label>
+                    <div className="p-4 rounded-lg bg-orange-50 border border-orange-300">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Banknote className="w-5 h-5" />
+                        <span className="font-medium">Cash on Delivery</span>
                       </div>
-
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-400 transition-colors">
-                        <RadioGroupItem value="paypal" id="paypal" className="border-orange-500 text-orange-600" />
-                        <Label htmlFor="paypal" className="text-gray-700 cursor-pointer flex items-center gap-2">
-                          <Wallet className="w-4 h-4" /> PayPal
-                        </Label>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-400 transition-colors">
-                        <RadioGroupItem value="bpi" id="bpi" className="border-orange-500 text-orange-600" />
-                        <Label htmlFor="bpi" className="text-gray-700 cursor-pointer flex items-center gap-2">
-                          <Building2 className="w-4 h-4" /> BPI Online
-                        </Label>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-400 transition-colors">
-                        <RadioGroupItem value="maya" id="maya" className="border-orange-500 text-orange-600" />
-                        <Label htmlFor="maya" className="text-gray-700 cursor-pointer flex items-center gap-2">
-                          <Wallet className="w-4 h-4" /> Maya
-                        </Label>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-300 hover:border-orange-400 transition-colors col-span-2">
-                        <RadioGroupItem value="cash" id="cash" className="border-orange-500 text-orange-600" />
-                        <Label htmlFor="cash" className="text-gray-700 cursor-pointer flex items-center gap-2">
-                          <Banknote className="w-4 h-4" /> Cash on Delivery
-                        </Label>
-                      </div>
-                    </RadioGroup>
-
-                    {(checkoutInfo.paymentMethod === "gcash" ||
-                      checkoutInfo.paymentMethod === "paypal" ||
-                      checkoutInfo.paymentMethod === "bpi" ||
-                      checkoutInfo.paymentMethod === "maya") && (
-                      <div className="space-y-4 pt-4 border-t border-orange-200">
-                        <div className="text-center">
-                          <h4 className="text-gray-700 font-semibold mb-3">
-                            {checkoutInfo.paymentMethod === "gcash" && "GCash Payment"}
-                            {checkoutInfo.paymentMethod === "paypal" && "PayPal Payment"}
-                            {checkoutInfo.paymentMethod === "bpi" && "BPI Online Banking"}
-                            {checkoutInfo.paymentMethod === "maya" && "Maya Payment"}
-                          </h4>
-                          <div className="bg-white p-4 rounded-lg inline-block border border-orange-200 shadow-sm">
-                            <img
-                              src="https://images.pexels.com/photos/4386321/pexels-photo-4386321.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop"
-                              alt="QR Code"
-                              className="w-48 h-48 object-cover mx-auto rounded-lg"
-                            />
-                          </div>
-                          <div className="mt-4 space-y-2">
-                            <p className="text-gray-600 text-sm">Scan QR code with your payment app</p>
-                            <p className="text-gray-700 font-mono text-sm">
-                              {checkoutInfo.paymentMethod === "gcash" && "GCash: +63 917 123 4567"}
-                              {checkoutInfo.paymentMethod === "paypal" && "PayPal: japaneseizakaya@restaurant.com"}
-                              {checkoutInfo.paymentMethod === "bpi" && "Account: 1234-5678-90"}
-                              {checkoutInfo.paymentMethod === "maya" && "Maya: +63 917 987 6543"}
-                            </p>
-                            <p className="text-gray-700 font-semibold">Amount: ₱{formatPrice(total)}</p>
-                          </div>
-                          <div className="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-300">
-                            <Label
-                              htmlFor="receipt"
-                              className="text-gray-700 font-medium block mb-2 flex items-center gap-2 justify-center"
-                            >
-                              <FileText className="w-4 h-4" /> Upload Payment Receipt
-                            </Label>
-                            <Input
-                              id="receipt"
-                              type="file"
-                              accept="image/*"
-                              onChange={handleReceiptUpload}
-                              className="bg-white border-orange-300 text-gray-900 file:bg-orange-600 file:text-white file:border-0 file:rounded file:px-3 file:py-1 file:mr-3 hover:file:bg-orange-700"
-                            />
-                            {receiptFile && receiptPreview && (
-                              <div className="mt-4 relative">
-                                <div className="relative inline-block">
-                                  <img
-                                    src={receiptPreview || "/placeholder.svg"}
-                                    alt="Receipt preview"
-                                    className="max-w-full h-auto max-h-64 rounded-lg border-2 border-orange-300"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={handleRemoveReceipt}
-                                    className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-lg transition-colors"
-                                    aria-label="Remove receipt"
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </div>
-                                <p className="text-gray-700 text-sm mt-2">✓ {receiptFile.name}</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                      <p className="text-sm text-gray-600 mt-2">Pay with cash when your order arrives</p>
+                    </div>
                   </div>
 
                   <Separator className="bg-orange-200" />
@@ -593,10 +461,10 @@ const Checkout = () => {
               </CardContent>
             </Card>
 
-            <Card className="h-fit bg-white/98 backdrop-blur-md border-orange-200 shadow-lg rounded-2xl sticky top-24">
-              <CardHeader className="border-b border-orange-200 bg-orange-600 text-white rounded-t-2xl py-0">
-                <CardTitle className="text-xl p-4">Order Summary</CardTitle>
-              </CardHeader>
+            <Card className="h-fit bg-white/98 backdrop-blur-md border-orange-200 shadow-lg rounded-2xl sticky top-24 overflow-hidden p-0">
+              <div className="border-b border-orange-200 bg-orange-600 text-white px-6 py-4">
+                <h2 className="text-xl font-semibold">Order Summary</h2>
+              </div>
               <CardContent className="space-y-4 p-6">
                 <div className="space-y-3">
                   {items.map((item) => {

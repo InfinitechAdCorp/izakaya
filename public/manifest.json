@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "theme_color": "#ff470a",
-  "background_color": "#0C5C3B",
+  "theme_color": "#FFB400", 
+  "background_color": "#1A1A1A", 
   "icons": [
     {
       "purpose": "maskable",
@@ -23,5 +23,6 @@
   "name": "Izakaya Tori Ichizu",
   "short_name": "izakaya",
   "start_url": "/",
-  "scope": "/"
+  "scope": "/",
+  "description": "Experience authentic Japanese dining with Izakaya Tori Ichizu."
 }

@@ -3,13 +3,64 @@ import { useState, useEffect } from "react"
 import type { MenuItem } from "@/types"
 import MenuItemCard from "@/components/ui/menu-item-card"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { Loader2, Download, X } from "lucide-react"
+import Image from "next/image"
 
 export default function MenuPage() {
   const [products, setProducts] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState("All")
+  
+  // Install app states
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [showInstallPopup, setShowInstallPopup] = useState(false)
+  const [showInstallButton, setShowInstallButton] = useState(false)
+
+  // Handle PWA install prompt
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+      setShowInstallButton(true)
+      
+      // Show popup after 3 seconds on page load
+      setTimeout(() => {
+        setShowInstallPopup(true)
+      }, 3000)
+    }
+
+    const handleAppInstalled = () => {
+      setShowInstallPopup(false)
+      setShowInstallButton(false)
+      setDeferredPrompt(null)
+    }
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+    window.addEventListener("appinstalled", handleAppInstalled)
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+      window.removeEventListener("appinstalled", handleAppInstalled)
+    }
+  }, [])
+
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) return
+
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+
+    if (outcome === "accepted") {
+      setShowInstallPopup(false)
+    }
+
+    setDeferredPrompt(null)
+  }
+
+  const handleDismissPopup = () => {
+    setShowInstallPopup(false)
+  }
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -17,7 +68,7 @@ export default function MenuPage() {
         setLoading(true)
         setError(null)
 
-        const response = await fetch("/api/product")
+        const response = await fetch("/api/product?paginate=false")
         if (!response.ok) throw new Error("Failed to fetch products")
         const data = await response.json()
 
@@ -71,8 +122,80 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-orange-900 to-yellow-900 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-black via-orange-900 to-yellow-900">
+      {/* Install Button - Mobile Only */}
+      {/* Temporarily always show for testing - remove 'true ||' when PWA is properly configured */}
+      {(true || showInstallButton) && (
+        <div className="fixed bottom-6 left-4 z-50 md:hidden">
+          <Button
+            onClick={handleInstallApp}
+            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-2xl hover:shadow-xl transition-all duration-300 rounded-full px-5 py-3 border-2 border-white flex items-center gap-2"
+            title="Install App"
+          >
+            <Download className="h-5 w-5" />
+            <span className="text-sm font-semibold">Install App</span>
+          </Button>
+        </div>
+      )}
+
+      {/* Install App Popup */}
+      {showInstallPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in duration-300">
+            {/* Close button */}
+            <button
+              onClick={handleDismissPopup}
+              className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 transition-colors bg-white/80 rounded-full p-1 hover:bg-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Top Section with Logo */}
+            <div className="bg-gradient-to-br from-orange-500 to-red-500 pt-10 pb-8 px-6">
+              <div className="flex justify-center mb-4">
+                <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
+                  <Image
+                    src="/logonew.png"
+                    alt="Izakaya Logo"
+                    width={140}
+                    height={140}
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-white text-center mb-2">
+                Install Izakaya App
+              </h2>
+              
+              <p className="text-white/95 text-center text-sm leading-relaxed">
+                Quick access • Faster ordering • Exclusive offers
+              </p>
+            </div>
+
+            {/* Bottom Section with Buttons */}
+            <div className="p-6 space-y-3">
+              <Button
+                onClick={handleInstallApp}
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-6 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Install Now
+              </Button>
+              
+              <Button
+                onClick={handleDismissPopup}
+                variant="ghost"
+                className="w-full text-gray-600 hover:bg-gray-100 py-3 rounded-xl"
+              >
+                Maybe Later
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto p-4">
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Izakaya Menu</h1>
           <p className="text-yellow-200 text-lg md:text-xl">Authentic Japanese izakaya flavors delivered fresh</p>

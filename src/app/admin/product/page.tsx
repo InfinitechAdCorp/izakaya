@@ -74,7 +74,7 @@ interface Product {
   id: number
   name: string
   description: string
-  price: number | string // Allow both number and string from API
+  price: number | string
   image: string
   category: string
   is_spicy?: boolean
@@ -93,23 +93,20 @@ const categories = [
   "Noodles",
   "Rice Dishes",
   "Soups",
+    "Sashimi",
 ]
 
-// Helper function to get valid image URL
 const getImageUrl = (imagePath: string): string => {
   if (!imagePath) {
-    return "/placeholder-food.jpg" // Fallback image
+    return "/placeholder-food.jpg"
   }
 
-  // If it's already a full URL, return as is
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
     return imagePath
   }
 
-  // If it's a relative path, construct the full URL with Laravel public path
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
-  // Handle Laravel storage path - if it doesn't start with images/products/, add it
   let fullPath = imagePath
   if (!imagePath.startsWith("images/products/")) {
     fullPath = `images/products/${imagePath}`
@@ -126,12 +123,12 @@ export default function ProductsAdminPage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // DataTable states
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [globalFilter, setGlobalFilter] = useState("")
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10)
+  const [currentPage, setCurrentPage] = useState<number>(1)
 
-  // State for mobile detection
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
     const checkMobile = () => {
@@ -142,7 +139,6 @@ export default function ProductsAdminPage() {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
-  // Create product modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [newFormData, setNewFormData] = useState({
     name: "",
@@ -159,13 +155,11 @@ export default function ProductsAdminPage() {
 
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
-  // Helper function to safely convert price to number
   const formatPrice = (price: number | string): string => {
     const numPrice = typeof price === "string" ? Number.parseFloat(price) : price
     return numPrice.toFixed(2)
   }
 
-  // Handle form changes
   const handleNewFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setNewFormData((prev) => ({ ...prev, [name]: value }))
@@ -179,7 +173,6 @@ export default function ProductsAdminPage() {
     setNewFormData((prev) => ({ ...prev, category: value }))
   }
 
-  // Handle image selection
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -192,7 +185,6 @@ export default function ProductsAdminPage() {
     }
   }
 
-  // Create product
   const handleCreateSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setIsCreating(true)
@@ -241,7 +233,6 @@ export default function ProductsAdminPage() {
     }
   }
 
-  // Reset form
   const resetForm = () => {
     setNewFormData({
       name: "",
@@ -259,7 +250,6 @@ export default function ProductsAdminPage() {
     }
   }
 
-  // Delete product
   const handleDelete = async (id: number) => {
     setDeletingId(id)
     try {
@@ -287,13 +277,13 @@ export default function ProductsAdminPage() {
     }
   }
 
-  // Fetch products
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const response = await fetch("/api/product")
+      const response = await fetch("/api/product?paginate=false")
       const result = await response.json()
       if (response.ok) {
+        console.log("Fetched products:", result.length) // Debug log
         setProducts(result)
       } else {
         throw new Error(result.message || "Failed to fetch products")
@@ -314,7 +304,6 @@ export default function ProductsAdminPage() {
     fetchProducts()
   }, [])
 
-  // Define columns for DataTable
   const columns: ColumnDef<Product>[] = [
     {
       id: "select",
@@ -621,7 +610,6 @@ export default function ProductsAdminPage() {
     },
   ]
 
-  // Initialize table instance
   const table = useReactTable({
     data: products,
     columns: columns,
@@ -637,6 +625,23 @@ export default function ProductsAdminPage() {
     onGlobalFilterChange: setGlobalFilter,
     onRowSelectionChange: setRowSelection,
   })
+
+  // Calculate pagination
+  const filteredRows = table.getFilteredRowModel().rows
+  const totalItems = filteredRows.length
+  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage)
+  const startIndex = itemsPerPage === -1 ? 0 : (currentPage - 1) * itemsPerPage
+  const endIndex = itemsPerPage === -1 ? totalItems : startIndex + itemsPerPage
+  const paginatedRows = itemsPerPage === -1 ? filteredRows : filteredRows.slice(startIndex, endIndex)
+
+  // Reset to page 1 when items per page changes or filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [itemsPerPage, globalFilter])
+
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(value === "all" ? -1 : parseInt(value))
+  }
 
   if (loading) {
     return (
@@ -671,7 +676,6 @@ export default function ProductsAdminPage() {
           )}
           <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6">
             <div className="max-w-full space-y-4 sm:space-y-6">
-              {/* Header */}
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-orange-100">
                   <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
@@ -683,7 +687,6 @@ export default function ProductsAdminPage() {
                 </div>
               </div>
 
-              {/* Filters and Search */}
               <Card className="bg-white/70 backdrop-blur-sm shadow-xl border-orange-100">
                 <CardHeader className="pb-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-t-lg">
                   <div className="flex flex-col gap-4">
@@ -698,7 +701,6 @@ export default function ProductsAdminPage() {
                         />
                       </div>
 
-                      {/* Create Product button */}
                       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
                         <DialogTrigger asChild>
                           <Button
@@ -921,8 +923,27 @@ export default function ProductsAdminPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="bg-white">
-                  <div className="text-sm text-gray-600 mb-4 font-medium">
-                    Showing {table.getFilteredRowModel().rows.length} of {products.length} products
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                    <div className="text-sm text-gray-600 font-medium">
+                      Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} products
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="items-per-page" className="text-sm text-gray-600 whitespace-nowrap">
+                        Items per page:
+                      </Label>
+                      <Select value={itemsPerPage === -1 ? "all" : itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                        <SelectTrigger id="items-per-page" className="w-[100px] border-orange-200 focus:border-orange-400 focus:ring-orange-400">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="25">25</SelectItem>
+                          <SelectItem value="50">50</SelectItem>
+                          <SelectItem value="100">100</SelectItem>
+                          <SelectItem value="all">All</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <div className="w-full">
                     <div className="rounded-lg border border-orange-200 overflow-hidden shadow-lg">
@@ -949,7 +970,7 @@ export default function ProductsAdminPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {table.getRowModel().rows.map((row, index) => (
+                            {paginatedRows.map((row, index) => (
                               <tr
                                 key={row.id}
                                 className={`border-b border-orange-100 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 transition-all duration-200 ${index % 2 === 0 ? "bg-white" : "bg-orange-25"}`}
@@ -974,6 +995,53 @@ export default function ProductsAdminPage() {
                         </div>
                         <p className="text-lg font-medium text-gray-700">No products found</p>
                         {globalFilter && <p className="text-sm mt-1 text-gray-500">Try adjusting your search terms</p>}
+                      </div>
+                    )}
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-orange-200">
+                        <div className="text-sm text-gray-600">
+                          Page {currentPage} of {totalPages}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(1)}
+                            disabled={currentPage === 1}
+                            className="border-orange-300 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+                          >
+                            First
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={currentPage === 1}
+                            className="border-orange-300 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            disabled={currentPage === totalPages}
+                            className="border-orange-300 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+                          >
+                            Next
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(totalPages)}
+                            disabled={currentPage === totalPages}
+                            className="border-orange-300 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+                          >
+                            Last
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>

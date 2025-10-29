@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useEffect } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -11,6 +12,7 @@ import OppaLoader from "@/components/oppa-loader"
 import { usePathname } from "next/navigation"
 import FloatingSocialMedia from "@/components/FloatingSocialMedia"
 import CustomerServiceChatbot from "@/components/CustomerServiceChatbot"
+import { useAuthStore } from "@/store/authStore"
 
 const queryClient = new QueryClient()
 
@@ -21,6 +23,13 @@ export default function ClientLayout({
 }) {
   const pathname = usePathname()
   const showHeader = pathname !== "/login" && pathname !== "/register"
+  
+  // Initialize auth from storage on mount
+  const initializeAuth = useAuthStore((state) => state.initializeAuth)
+
+  useEffect(() => {
+    initializeAuth()
+  }, [initializeAuth])
 
   return (
     <>

@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
-import { X } from "lucide-react"
+import { X, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface Product {
   id: number
@@ -21,87 +21,31 @@ export default function HeroSection() {
   const [dishes, setDishes] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDish, setSelectedDish] = useState<Product | null>(null)
+  const [selectedDishIndex, setSelectedDishIndex] = useState<number>(0)
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchAllProducts = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        const response = await fetch(`${API_URL}/api/products?is_featured=1&limit=3`)
-        if (response.ok) {
-          const data = await response.json()
-          const products = Array.isArray(data) ? data : data.data || []
-
-          if (products.length > 0) {
-            setDishes(products.slice(-3))
-          } else {
-            setDishes([
-              {
-                id: 1,
-                name: "Yakitori Assorted",
-                description: "Premium grilled chicken skewers with traditional Japanese sauce and sesame.",
-                price: 0,
-                category: "Yakitori",
-                image_url: "/japanese-yakitori-grilled-chicken-skewers.jpg",
-                is_featured: true,
-              },
-              {
-                id: 2,
-                name: "Tonkotsu Ramen",
-                description: "Rich pork bone broth ramen with tender chashu pork and soft-boiled egg.",
-                price: 0,
-                category: "Ramen",
-                image_url: "/japanese-tonkotsu-ramen-bowl.jpg",
-                is_featured: true,
-              },
-              {
-                id: 3,
-                name: "Sashimi Platter",
-                description: "Fresh assorted sashimi including salmon, tuna, and white fish.",
-                price: 0,
-                category: "Sashimi",
-                image_url: "/japanese-sashimi-platter.jpg",
-                is_featured: true,
-              },
-            ])
-          }
+        // Fetch ALL products from the Next.js API route
+        const response = await fetch('/api/product?paginate=false')
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.status}`)
         }
+        
+        const data = await response.json()
+        const products = Array.isArray(data) ? data : []
+        
+        setDishes(products)
       } catch (error) {
-        console.error("Error fetching featured products:", error)
-        setDishes([
-          {
-            id: 1,
-            name: "Yakitori Assorted",
-            description: "Premium grilled chicken skewers with traditional Japanese sauce and sesame.",
-            price: 0,
-            category: "Yakitori",
-            image_url: "/japanese-yakitori-grilled-chicken-skewers.jpg",
-            is_featured: true,
-          },
-          {
-            id: 2,
-            name: "Tonkotsu Ramen",
-            description: "Rich pork bone broth ramen with tender chashu pork and soft-boiled egg.",
-            price: 0,
-            category: "Ramen",
-            image_url: "/japanese-tonkotsu-ramen-bowl.jpg",
-            is_featured: true,
-          },
-          {
-            id: 3,
-            name: "Sashimi Platter",
-            description: "Fresh assorted sashimi including salmon, tuna, and white fish.",
-            price: 0,
-            category: "Sashimi",
-            image_url: "/japanese-sashimi-platter.jpg",
-            is_featured: true,
-          },
-        ])
+        console.error("Error fetching all products:", error)
+        setDishes([])
       } finally {
         setLoading(false)
       }
     }
 
-    fetchFeaturedProducts()
+    fetchAllProducts()
   }, [])
 
   useEffect(() => {
@@ -113,10 +57,23 @@ export default function HeroSection() {
     return () => clearInterval(interval)
   }, [dishes.length, selectedDish])
 
-  const handleCardClick = (dish: Product, offset: number) => {
+  const handleCardClick = (dish: Product, offset: number, index: number) => {
     if (offset === 0) {
       setSelectedDish(dish)
+      setSelectedDishIndex(index)
     }
+  }
+
+  const handleModalNext = () => {
+    const nextIndex = (selectedDishIndex + 1) % dishes.length
+    setSelectedDishIndex(nextIndex)
+    setSelectedDish(dishes[nextIndex])
+  }
+
+  const handleModalPrev = () => {
+    const prevIndex = selectedDishIndex === 0 ? dishes.length - 1 : selectedDishIndex - 1
+    setSelectedDishIndex(prevIndex)
+    setSelectedDish(dishes[prevIndex])
   }
 
   return (
@@ -169,17 +126,6 @@ export default function HeroSection() {
             <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-16">
               {/* Left side - Text content */}
               <div className="flex-1 text-center lg:text-left text-white order-2 lg:order-1 w-full">
-                {/* <div className="mb-4 lg:mb-8 flex justify-center lg:justify-start">
-                  <Image
-                    src="/logo.png"
-                    alt="Izakaya Tori Ichizu Logo"
-                    width={200}
-                    height={140}
-                    className="drop-shadow-2xl lg:w-[280px] lg:h-auto"
-                    priority
-                  />
-                </div> */}
-
                 <p className="text-lg md:text-2xl lg:text-3xl font-light text-yellow-100 mb-4 lg:mb-8">
                   "Where Tradition Meets Authentic Taste"
                 </p>
@@ -210,13 +156,38 @@ export default function HeroSection() {
               </div>
 
               {/* Right side - 3D Carousel */}
-              <div className="flex-1 flex flex-col items-center order-1 lg:order-2 w-full">
+              <div className="flex-1 flex flex-col items-center order-1 lg:order-2 w-full px-12 lg:px-0">
                 {loading ? (
                   <div className="w-72 h-80 lg:w-80 lg:h-96 flex items-center justify-center">
                     <div className="w-8 h-8 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
                   </div>
+                ) : dishes.length === 0 ? (
+                  <div className="w-72 h-80 lg:w-80 lg:h-96 flex items-center justify-center text-yellow-100 text-center px-4">
+                    <p>No products available at the moment.</p>
+                  </div>
                 ) : (
-                  <>
+                  <div className="relative w-full">
+                    {/* Carousel Navigation Arrows - Outside the carousel */}
+                    {dishes.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentSlide(prev => prev === 0 ? dishes.length - 1 : prev - 1)}
+                          className="absolute -left-4 lg:left-0 top-1/2 -translate-y-1/2 z-[100] bg-black/70 hover:bg-black/90 text-yellow-400 p-2 lg:p-3 rounded-full shadow-xl transition-all hover:scale-110 touch-manipulation"
+                          aria-label="Previous slide"
+                        >
+                          <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" />
+                        </button>
+
+                        <button
+                          onClick={() => setCurrentSlide(prev => (prev + 1) % dishes.length)}
+                          className="absolute -right-4 lg:right-0 top-1/2 -translate-y-1/2 z-[100] bg-black/70 hover:bg-black/90 text-yellow-400 p-2 lg:p-3 rounded-full shadow-xl transition-all hover:scale-110 touch-manipulation"
+                          aria-label="Next slide"
+                        >
+                          <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
+                        </button>
+                      </>
+                    )}
+
                     <div
                       className="relative w-72 h-80 lg:w-80 lg:h-96 mx-auto mb-4 lg:mb-8"
                       style={{ perspective: "1000px" }}
@@ -226,6 +197,11 @@ export default function HeroSection() {
                         const isActive = offset === 0
                         const isNext = offset === 1 || offset === -(dishes.length - 1)
                         const isPrev = offset === -1 || offset === dishes.length - 1
+
+                        // Hide cards that are too far away
+                        if (Math.abs(offset) > 1 && offset !== dishes.length - 1 && offset !== -(dishes.length - 1)) {
+                          return null
+                        }
 
                         return (
                           <div
@@ -242,12 +218,13 @@ export default function HeroSection() {
                             style={{
                               transform: `
                                 translateX(${offset * 100}px) 
-                                rotateY(${offset * 45}deg) 
-                                scale(${isActive ? 1 : 0.75})
-                                translateZ(${isActive ? 0 : -100}px)
+                                rotateY(${offset * 35}deg) 
+                                scale(${isActive ? 1 : 0.8})
+                                translateZ(${isActive ? 0 : -80}px)
                               `,
+                              filter: isActive ? 'brightness(1)' : 'brightness(0.6)',
                             }}
-                            onClick={() => handleCardClick(dish, offset)}
+                            onClick={() => handleCardClick(dish, offset, i)}
                           >
                             <div className="bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 shadow-2xl h-full hover:bg-white/15 transition-colors">
                               <div className="relative h-48 lg:h-64 overflow-hidden">
@@ -258,11 +235,16 @@ export default function HeroSection() {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                               </div>
-                              <div className="p-4 lg:p-6 text-left">
-                                <h3 className="text-xl lg:text-2xl font-semibold mb-2 lg:mb-3 text-yellow-400">
+                              <div className="px-3 pt-1 pb-3 lg:px-4 lg:pt-1.5 lg:pb-4 text-left">
+                                <h3 className="text-lg lg:text-xl font-semibold mb-1 text-yellow-400">
                                   {dish.name}
                                 </h3>
-                                <p className="text-yellow-100 text-xs lg:text-base leading-relaxed line-clamp-2 lg:line-clamp-3">
+                                {dish.price > 0 && (
+                                  <p className="text-lg lg:text-xl font-bold mb-2 text-yellow-300">
+                                    ₱{Number(dish.price).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                  </p>
+                                )}
+                                <p className="text-yellow-100 text-xs lg:text-sm leading-relaxed line-clamp-3 lg:line-clamp-4">
                                   {dish.description}
                                 </p>
 
@@ -272,6 +254,7 @@ export default function HeroSection() {
                                     onClick={(e) => {
                                       e.stopPropagation()
                                       setSelectedDish(dish)
+                                      setSelectedDishIndex(i)
                                     }}
                                   >
                                     Read More →
@@ -283,21 +266,7 @@ export default function HeroSection() {
                         )
                       })}
                     </div>
-
-                    {/* Carousel indicators */}
-                    <div className="flex justify-center gap-2">
-                      {dishes.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setCurrentSlide(i)}
-                          className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                            i === currentSlide ? "bg-yellow-400 scale-125" : "bg-white/30 hover:bg-white/50"
-                          }`}
-                          aria-label={`Go to slide ${i + 1}`}
-                        />
-                      ))}
-                    </div>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -305,19 +274,46 @@ export default function HeroSection() {
         </div>
       </section>
 
-      {/* Modal Popup */}
+      {/* Modal Popup with Navigation */}
       {selectedDish && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300"
           onClick={() => setSelectedDish(null)}
         >
+          {/* Navigation Arrows - Outside the card */}
+          {dishes.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleModalPrev()
+                }}
+                className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-[60] bg-black/70 hover:bg-black/90 text-yellow-400 rounded-full p-2 md:p-3 transition-all hover:scale-110 shadow-xl border border-yellow-400/30 touch-manipulation"
+                aria-label="Previous item"
+              >
+                <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleModalNext()
+                }}
+                className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-[60] bg-black/70 hover:bg-black/90 text-yellow-400 rounded-full p-2 md:p-3 transition-all hover:scale-110 shadow-xl border border-yellow-400/30 touch-manipulation"
+                aria-label="Next item"
+              >
+                <ChevronRight className="w-6 h-6 md:w-7 md:h-7" />
+              </button>
+            </>
+          )}
+
           <div
             className="relative bg-gradient-to-br from-black to-orange-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-yellow-400/30 animate-in zoom-in duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setSelectedDish(null)}
-              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors touch-manipulation"
               aria-label="Close"
             >
               <X size={24} />
@@ -330,6 +326,13 @@ export default function HeroSection() {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              
+              {/* Item counter */}
+              {dishes.length > 1 && (
+                <div className="absolute bottom-4 right-4 bg-black/70 text-yellow-400 px-3 py-1 rounded-full text-sm font-medium">
+                  {selectedDishIndex + 1} / {dishes.length}
+                </div>
+              )}
             </div>
 
             <div className="p-6 md:p-8">
@@ -338,22 +341,16 @@ export default function HeroSection() {
                   {selectedDish.category}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold text-yellow-400 mb-2">{selectedDish.name}</h2>
+                {selectedDish.price > 0 && (
+                  <p className="text-2xl md:text-3xl font-bold text-yellow-300 mt-2">
+                    ₱{Number(selectedDish.price).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </p>
+                )}
               </div>
 
               <div className="text-yellow-100 text-base md:text-lg leading-relaxed space-y-4">
                 {selectedDish.description}
               </div>
-
-              {selectedDish.price > 0 && (
-                <div className="mt-6 pt-6 border-t border-orange-700">
-                  <p className="text-2xl font-semibold text-yellow-400">
-                    ₱
-                    {Number(selectedDish.price)
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  </p>
-                </div>
-              )}
 
               <div className="mt-6">
                 <Button

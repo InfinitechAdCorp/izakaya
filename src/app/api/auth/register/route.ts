@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { generateVerificationToken, sendVerificationEmail } from '@/lib/nodemailer'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Name, email, password, and password confirmation are required. 이름, 이메일, 비밀번호, 비밀번호 확인은 필수 항목입니다.',
+          message: 'Name, email, password, and password confirmation are required.',
           errors: {
             name: !body.name ? ['Name is required'] : [],
             email: !body.email ? ['Email is required'] : [],
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Passwords do not match. 비밀번호가 일치하지 않습니다.',
+          message: 'Passwords do not match.',
           errors: {
             password_confirmation: ['The password confirmation does not match.']
           }
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Password must be at least 8 characters long. 비밀번호는 8자 이상이어야 합니다.',
+          message: 'Password must be at least 8 characters long.',
           errors: {
             password: ['The password must be at least 8 characters.']
           }
@@ -53,6 +54,25 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Phone validation
+    if (body.phone && body.phone.length !== 11) {
+      console.log('Invalid phone number length')
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Phone number must be exactly 11 digits.',
+          errors: {
+            phone: ['Phone number must be exactly 11 digits.']
+          }
+        },
+        { status: 400 }
+      )
+    }
+
+    // Generate verification token
+    const verificationToken = generateVerificationToken()
+    const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
     const fullUrl = `${apiUrl}/api/auth/register`
@@ -68,6 +88,9 @@ export async function POST(request: NextRequest) {
       zip_code: body.zip_code?.trim() || '',
       password: body.password,
       password_confirmation: body.password_confirmation,
+      verification_token: verificationToken,
+      verification_token_expiry: verificationTokenExpiry.toISOString(),
+      email_verified: false,
     }
     
     console.log('Sending data to Laravel:', { ...requestData, password: '[HIDDEN]', password_confirmation: '[HIDDEN]' })
@@ -83,7 +106,6 @@ export async function POST(request: NextRequest) {
     })
 
     console.log('Laravel API response status:', response.status)
-    console.log('Laravel API response headers:', Object.fromEntries(response.headers.entries()))
 
     let data
     const responseText = await response.text()
@@ -94,59 +116,64 @@ export async function POST(request: NextRequest) {
       console.log('Laravel API parsed response:', data)
     } catch (parseError) {
       console.error('Failed to parse Laravel response as JSON:', parseError)
-      console.log('Response was not valid JSON, raw text:', responseText)
       
       return NextResponse.json(
         {
           success: false,
-          message: 'Invalid response from server. Server may be down or returning HTML error page.',
+          message: 'Invalid response from server.',
           error: 'Invalid JSON response',
-          rawResponse: responseText.substring(0, 500), // First 500 chars for debugging
-          debug: {
-            url: fullUrl,
-            status: response.status,
-            statusText: response.statusText
-          }
+          rawResponse: responseText.substring(0, 500),
         },
         { status: 502 }
       )
     }
 
+    // If registration successful, send verification email
+    if (response.ok && data.success) {
+      try {
+        await sendVerificationEmail(
+          requestData.email,
+          requestData.name,
+          verificationToken
+        )
+        console.log('Verification email sent successfully')
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError)
+        // Still return success but note the email issue
+        return NextResponse.json({
+          success: true,
+          message: 'Account created but verification email failed to send. Please contact support.',
+          data: data.data,
+          emailSent: false,
+        }, { status: 200 })
+      }
+    }
+
     console.log('=== REGISTRATION DEBUG END ===')
 
-    // Return the response with the same status code
-    return NextResponse.json(data, { 
+    // Return success with email sent flag
+    return NextResponse.json({
+      ...data,
+      emailSent: true,
+      message: 'Registration successful! Please check your email to verify your account.',
+    }, { 
       status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-      }
     })
 
   } catch (error: unknown) {
     console.error('=== REGISTRATION ERROR ===')
 
     if (error instanceof Error) {
-      console.error('Error type:', error.constructor.name)
       console.error('Error message:', error.message)
-      console.error('Full error:', error)
       console.error('Stack trace:', error.stack)
-    } else {
-      console.error('Non-Error thrown:', error)
     }
     
-    // Check if it's a network error
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      console.error('Network/Connection error detected')
       return NextResponse.json(
         {
           success: false,
-          message: 'Cannot connect to the server. Please make sure your Laravel backend is running on http://localhost:8000. 서버에 연결할 수 없습니다.',
+          message: 'Cannot connect to the server. Please make sure your Laravel backend is running.',
           error: 'Connection failed to Laravel backend',
-          debug: {
-            errorType: 'NetworkError',
-            errorMessage: error instanceof Error ? error.message : String(error),
-            apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-          }
         },
         { status: 503 }
       )
@@ -155,12 +182,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: 'Registration failed. Please try again later. 회원가입에 실패했습니다. 나중에 다시 시도해 주세요.',
+        message: 'Registration failed. Please try again later.',
         error: error instanceof Error ? error.message : 'Unknown error',
-        debug: {
-          errorType: error instanceof Error ? error.constructor.name : typeof error,
-          stack: error instanceof Error ? error.stack?.split('\n').slice(0, 5) : [],
-        }
       },
       { status: 500 }
     )

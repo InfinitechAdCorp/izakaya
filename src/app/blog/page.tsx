@@ -12,7 +12,8 @@ interface BlogPost {
   content: string
   author: string
   created_at: string
-  image_url: string
+  video_url?: string      // Added
+  thumbnail_url?: string  // Added
 }
 
 export default function BlogPage() {
@@ -72,7 +73,7 @@ export default function BlogPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="animate-pulse overflow-hidden rounded-lg border-2 border-orange-100">
-                <div className="h-56 bg-gradient-to-br from-orange-200 to-yellow-200"></div>
+                <div className="h-72 bg-gradient-to-br from-orange-200 to-yellow-200"></div>
                 <div className="p-4">
                   <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="space-y-2 mt-3">
@@ -100,7 +101,7 @@ export default function BlogPage() {
             {posts.map((post, index) => (
               <div
                 key={post.id}
-                className="group overflow-hidden rounded-lg border-2 border-orange-100/50 hover:border-orange-300 bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:rotate-1 cursor-pointer"
+                className="group flex flex-col overflow-hidden rounded-lg border-2 border-orange-100/50 hover:border-orange-300 bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:rotate-1 cursor-pointer"
                 style={{
                   animationDelay: `${index * 100}ms`,
                   animation: 'fadeInUp 0.6s ease-out forwards',
@@ -108,16 +109,23 @@ export default function BlogPage() {
                 }}
                 onClick={() => setSelectedPost(post)}
               >
-                {/* Image with overlay */}
-                <div className="relative h-56 overflow-hidden bg-gradient-to-br from-orange-100 to-yellow-100">
-                  {post.image_url ? (
+                {/* Thumbnail/Video Preview */}
+                <div className="relative h-72 overflow-hidden bg-gradient-to-br from-orange-100 to-yellow-100">
+                  {post.thumbnail_url ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${post.image_url}`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${post.thumbnail_url}`}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       onError={(e) => {
                         e.currentTarget.src = "/placeholder.svg"
                       }}
+                    />
+                  ) : post.video_url ? (
+                    <video
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${post.video_url}`}
+                      className="w-full h-full object-cover"
+                      muted
+                      playsInline
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-5xl">
@@ -126,6 +134,13 @@ export default function BlogPage() {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   
+                  {/* Video indicator */}
+                  {post.video_url && (
+                    <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                      ▶️ Video
+                    </div>
+                  )}
+                  
                   {/* Date badge */}
                   <div className="absolute top-4 right-4 bg-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
                     {new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -133,7 +148,7 @@ export default function BlogPage() {
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
+                <div className="p-4 flex flex-col flex-grow">
                   <h3 className="text-xl font-bold line-clamp-2 group-hover:text-orange-600 transition-colors leading-tight mb-3">
                     {post.title}
                   </h3>
@@ -153,13 +168,15 @@ export default function BlogPage() {
                     </div>
                   </div>
 
-                  {/* Button */}
-                  <Button
-                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
-                  >
-                    Read More 
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                  </Button>
+                  {/* Button - pushed to bottom */}
+                  <div className="mt-auto">
+                    <Button
+                      className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
+                    >
+                      Read More 
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -188,11 +205,18 @@ export default function BlogPage() {
             className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header Image */}
+            {/* Modal Header - Video or Thumbnail */}
             <div className="relative h-64 md:h-96 overflow-hidden bg-gradient-to-br from-orange-100 to-yellow-100">
-              {selectedPost.image_url ? (
+              {selectedPost.video_url ? (
+                <video
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${selectedPost.video_url}`}
+                  className="w-full h-full object-cover"
+                  controls
+                  playsInline
+                />
+              ) : selectedPost.thumbnail_url ? (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${selectedPost.image_url}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${selectedPost.thumbnail_url}`}
                   alt={selectedPost.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -208,19 +232,21 @@ export default function BlogPage() {
               {/* Close button */}
               <button
                 onClick={() => setSelectedPost(null)}
-                className="absolute top-4 right-4 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                className="absolute top-4 right-4 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-10"
               >
                 <X className="w-6 h-6 text-gray-800" />
               </button>
 
               {/* Date badge */}
-              <div className="absolute top-4 left-4 bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                {new Date(selectedPost.created_at).toLocaleDateString('en-US', { 
-                  month: 'long', 
-                  day: 'numeric',
-                  year: 'numeric' 
-                })}
-              </div>
+              {!selectedPost.video_url && (
+                <div className="absolute top-4 left-4 bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                  {new Date(selectedPost.created_at).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric',
+                    year: 'numeric' 
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Modal Content */}

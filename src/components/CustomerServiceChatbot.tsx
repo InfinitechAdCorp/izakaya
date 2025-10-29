@@ -17,12 +17,13 @@ const FAQ_DATA = [
   {
     question: "What type of restaurant is Izakaya Tori Ichizu?",
     answer:
-      "Izakaya Tori Ichizu is an authentic Japanese izakaya specializing in yakitori (grilled chicken skewers) and traditional Japanese pub fare. We've been serving the community since 2018.",
+      "Izakaya Tori Ichizu is an authentic Japanese izakaya specializing in yakitori (grilled chicken skewers) and traditional Japanese pub fare. We've been serving the community since 2025.",
   },
-  {
-    question: "What are your operating hours?",
-    answer: "We're open daily! Please contact us directly for specific hours or visit our location in Malate, Manila.",
-  },
+{
+  question: "What are your operating hours?",
+  answer: "Our operating hours are Monday to Thursday from 11:00 AM to 2:00 AM, and Friday to Sunday from 11:00 AM to 4:00 AM. Visit us at 1st Floor, PISO PAY.COM BLDG, #47 Polaris St, Bel-Air, Makati City.",
+},
+
   {
     question: "Do you offer vegetarian or vegan options?",
     answer:

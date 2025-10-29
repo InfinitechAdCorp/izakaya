@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import { Star, Send, Sparkles, CheckCircle, ArrowRight } from "lucide-react"
+import { Star, Send, Sparkles, CheckCircle, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface Testimonial {
   id: number
@@ -20,6 +20,7 @@ export default function TestimonialsPage() {
   const [hoverRating, setHoverRating] = useState(0)
   const [charCount, setCharCount] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
 
   const [formData, setFormData] = useState({
     client_name: "",
@@ -97,6 +98,18 @@ export default function TestimonialsPage() {
     }
   }
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % testimonials.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length)
+  }
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index)
+  }
+
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-white py-16 px-4 flex items-center justify-center">
@@ -131,7 +144,7 @@ export default function TestimonialsPage() {
         {/* Main Grid */}
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Testimonials Carousel - Left Side (2 cols) */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 overflow-hidden">
             {loading && (
               <div className="text-center py-16">
                 <Sparkles className="w-8 h-8 text-orange-500 mx-auto animate-spin mb-4" />
@@ -146,66 +159,127 @@ export default function TestimonialsPage() {
             )}
 
             {!loading && !error && (
-              <div className="space-y-6">
+              <>
                 {testimonials.length === 0 ? (
                   <div className="text-center py-16 bg-white rounded-3xl border-2 border-orange-100">
                     <Sparkles className="w-12 h-12 text-orange-400 mx-auto mb-4" />
                     <p className="text-gray-600 text-lg font-semibold">Be the first to share your story</p>
                   </div>
                 ) : (
-                  testimonials.map((testimonial, idx) => (
-                    <div
-                      key={testimonial.id}
-                      className="group relative bg-white border-2 border-orange-100 rounded-3xl p-8 hover:border-orange-300 hover:shadow-xl transition-all duration-500 overflow-hidden"
-                    >
-                      {/* Gradient overlay on hover */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-orange-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative">
+                    {/* Carousel Container */}
+                    <div className="overflow-hidden rounded-3xl">
+                      <div
+                        className="flex transition-transform duration-500 ease-in-out"
+                        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                      >
+                        {testimonials.map((testimonial) => (
+                          <div
+                            key={testimonial.id}
+                            className="w-full flex-shrink-0 px-8 sm:px-12"
+                          >
+                            <div className="group relative bg-white border-2 border-orange-100 rounded-3xl p-5 sm:p-6 md:p-8 hover:border-orange-300 hover:shadow-xl transition-all duration-500 overflow-hidden">
+                              {/* Gradient overlay on hover */}
+                              <div className="absolute inset-0 bg-gradient-to-r from-orange-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                      <div className="relative">
-                        {/* Stars */}
-                        <div className="flex gap-1 mb-4">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-5 h-5 ${
-                                i < testimonial.rating
-                                  ? "text-yellow-400 fill-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
+                              <div className="relative">
+                                {/* Stars */}
+                                <div className="flex gap-1 mb-3 sm:mb-4">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                                        i < testimonial.rating
+                                          ? "text-yellow-400 fill-yellow-400"
+                                          : "text-gray-300"
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
 
-                        {/* Quote Mark */}
-                        <p className="text-6xl text-orange-200 font-serif leading-none mb-2">"</p>
+                                {/* Quote Mark */}
+                                <p className="text-3xl sm:text-5xl md:text-6xl text-orange-200 font-serif leading-none mb-2">"</p>
 
-                        {/* Message */}
-                        <p className="text-lg text-gray-700 leading-relaxed mb-6 font-light">
-                          {testimonial.message}
-                        </p>
+                                {/* Message */}
+                                <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed mb-4 sm:mb-6 font-light">
+                                  {testimonial.message}
+                                </p>
 
-                        {/* Divider */}
-                        <div className="h-px bg-gradient-to-r from-orange-100/0 via-orange-100/50 to-orange-100/0 mb-6" />
+                                {/* Divider */}
+                                <div className="h-px bg-gradient-to-r from-orange-100/0 via-orange-100/50 to-orange-100/0 mb-4 sm:mb-6" />
 
-                        {/* Author */}
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-bold text-gray-900 text-lg">{testimonial.client_name}</p>
-                            <p className="text-sm text-gray-500">
-                              {new Date(testimonial.created_at).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
-                            </p>
+                                {/* Author */}
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="font-bold text-gray-900 text-sm sm:text-base md:text-lg">{testimonial.client_name}</p>
+                                    <p className="text-xs sm:text-sm text-gray-500">
+                                      {new Date(testimonial.created_at).toLocaleDateString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      })}
+                                    </p>
+                                  </div>
+                                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-orange-300/0 group-hover:text-orange-400 transition-all duration-500 group-hover:translate-x-1" />
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <ArrowRight className="w-5 h-5 text-orange-300/0 group-hover:text-orange-400 transition-all duration-500 group-hover:translate-x-1" />
-                        </div>
+                        ))}
                       </div>
                     </div>
-                  ))
+
+                    {/* Navigation Buttons */}
+                    {testimonials.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevSlide}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-2 sm:p-2.5 md:p-3 rounded-full shadow-lg transition-all"
+                          style={{ zIndex: 9999 }}
+                          aria-label="Previous testimonial"
+                        >
+                          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                        <button
+                          onClick={nextSlide}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-2 sm:p-2.5 md:p-3 rounded-full shadow-lg transition-all"
+                          style={{ zIndex: 9999 }}
+                          aria-label="Next testimonial"
+                        >
+                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Dots Indicator */}
+                    {testimonials.length > 1 && (
+                      <div className="flex justify-center gap-2 mt-6">
+                        {testimonials.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => goToSlide(index)}
+                            className={`h-2 rounded-full transition-all ${
+                              currentSlide === index
+                                ? "bg-orange-500 w-8"
+                                : "bg-orange-200 w-2 hover:bg-orange-300"
+                            }`}
+                            aria-label={`Go to testimonial ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Counter */}
+                    {testimonials.length > 1 && (
+                      <div className="text-center mt-4">
+                        <p className="text-sm text-gray-500 font-medium">
+                          {currentSlide + 1} / {testimonials.length}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 )}
-              </div>
+              </>
             )}
           </div>
 

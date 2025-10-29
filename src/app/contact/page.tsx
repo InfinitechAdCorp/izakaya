@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
@@ -25,6 +26,12 @@ export default function Contact() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handlePhoneChange = (value: string) => {
+    // Only allow numbers and limit to 11 digits
+    const numbersOnly = value.replace(/\D/g, "").slice(0, 11)
+    setFormData((prev) => ({ ...prev, phone: numbersOnly }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -32,6 +39,16 @@ export default function Contact() {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate phone number if provided
+    if (formData.phone && formData.phone.length !== 11) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Phone number must be exactly 11 digits.",
         variant: "destructive",
       })
       return
@@ -115,13 +132,14 @@ export default function Contact() {
                 <CardContent className="p-6 text-center">
                   <MapPin className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
                   <h3 className="font-semibold mb-2 text-yellow-300">Visit Us</h3>
-                  <p className="text-sm text-yellow-200/80">
-                    123 Japanese Street
-                    <br />
-                    Food District
-                    <br />
-                    City, State 12345
-                  </p>
+                  <a 
+                    href="https://maps.app.goo.gl/5NYrsNXawKobjQCf9" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-yellow-200/80 hover:text-yellow-300 hover:underline transition-colors"
+                  >
+                    1st Floor, PISO PAY.COM BLDG, #47 Polaris St, Bel-Air, Makati City
+                  </a>
                 </CardContent>
               </Card>
 
@@ -129,9 +147,13 @@ export default function Contact() {
                 <CardContent className="p-6 text-center">
                   <Phone className="w-8 h-8 text-orange-400 mx-auto mb-3" />
                   <h3 className="font-semibold mb-2 text-yellow-300">Call Us</h3>
-                  <p className="text-sm text-yellow-200/80">
-                    0977 722 9947
-                    <br />
+                  <a 
+                    href="tel:+6283620676" 
+                    className="text-sm text-yellow-200/80 hover:text-yellow-300 hover:underline transition-colors"
+                  >
+                   (02) 8362 0676
+                  </a>
+                  <p className="text-sm text-yellow-200/80 mt-1">
                     Available daily
                   </p>
                 </CardContent>
@@ -141,11 +163,13 @@ export default function Contact() {
                 <CardContent className="p-6 text-center">
                   <Mail className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
                   <h3 className="font-semibold mb-2 text-yellow-300">Email Us</h3>
-                  <p className="text-sm text-yellow-200/80">
-                    hello@izakayatorichizu.com
-                    <br />
-                    reservations@izakayatorichizu.com
-                    <br />
+                  <a 
+                    href="mailto:ph.toriichizu01@gmail.com" 
+                    className="text-sm text-yellow-200/80 hover:text-yellow-300 hover:underline transition-colors block"
+                  >
+                   ph.toriichizu01@gmail.com
+                  </a>
+                  <p className="text-sm text-yellow-200/80 mt-1">
                     We respond within 24hrs
                   </p>
                 </CardContent>
@@ -156,11 +180,10 @@ export default function Contact() {
                   <Clock className="w-8 h-8 text-orange-500 mx-auto mb-3" />
                   <h3 className="font-semibold mb-2 text-yellow-300">Hours</h3>
                   <p className="text-sm text-yellow-200/80">
-                    Mon-Thu: 11AM-9PM
+                    Monday-Thursday: 11AM-2AM
                     <br />
-                    Fri-Sat: 11AM-10PM
-                    <br />
-                    Sunday: 12PM-8PM
+                    Friday-Sunday: 11AM-4AM
+                    <br />                  
                   </p>
                 </CardContent>
               </Card>
@@ -174,15 +197,27 @@ export default function Contact() {
                 <div>
                   <h4 className="font-semibold text-yellow-400 mb-2">Table Reservations</h4>
                   <p className="text-sm text-yellow-200/80">
-                    For parties of 6 or more, we recommend making a reservation. Call us at 0977 722 9947 or use our
-                    online booking system.
+                    For parties of 6 or more, we recommend making a reservation. Call us at{" "}
+                    <a 
+                      href="tel:+6283620676" 
+                      className="text-orange-400 hover:text-orange-300 hover:underline transition-colors"
+                    >
+                      (02) 8362 0676
+                    </a>{" "}
+                    or use our online booking system.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-semibold text-orange-400 mb-2">Private Events</h4>
                   <p className="text-sm text-yellow-200/80">
-                    We cater private events and parties! Contact us for custom menu options and pricing for your special
-                    occasion.
+                    We cater private events and parties! Contact us at{" "}
+                    <a 
+                      href="mailto:ph.toriichizu01@gmail.com" 
+                      className="text-yellow-400 hover:text-yellow-300 hover:underline transition-colors"
+                    >
+                      ph.toriichizu01@gmail.com
+                    </a>{" "}
+                    for custom menu options and pricing for your special occasion.
                   </p>
                 </div>
                 <div>
@@ -235,31 +270,65 @@ export default function Contact() {
 
                 <div>
                   <Label htmlFor="phone" className="text-yellow-200">
-                    Phone
+                    Phone (Optional)
                   </Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    placeholder="input your phone number"
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    placeholder="09XXXXXXXXX (11 digits)"
                     className="border-orange-600/50 bg-black/50 text-yellow-100 placeholder:text-yellow-700 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base"
                     disabled={isSubmitting}
+                    maxLength={11}
                   />
+                  {formData.phone && formData.phone.length > 0 && formData.phone.length !== 11 && (
+                    <p className="text-xs text-red-400 mt-1">Must be exactly 11 digits</p>
+                  )}
                 </div>
 
                 <div>
                   <Label htmlFor="subject" className="text-yellow-200">
                     Subject
                   </Label>
-                  <Input
-                    id="subject"
-                    value={formData.subject}
-                    onChange={(e) => handleInputChange("subject", e.target.value)}
-                    placeholder="What's this about?"
-                    className="border-orange-600/50 bg-black/50 text-yellow-100 placeholder:text-yellow-700 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base"
+                  <Select 
+                    value={formData.subject} 
+                    onValueChange={(value) => handleInputChange("subject", value)}
                     disabled={isSubmitting}
-                  />
+                  >
+                    <SelectTrigger className="border-orange-600/50 bg-black/50 text-yellow-100 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base">
+                      <SelectValue placeholder="Select a topic" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-black/95 border-orange-600/50">
+                      <SelectItem value="reservations" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Reservations & Dining
+                      </SelectItem>
+                      <SelectItem value="menu" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Menu & Food Information
+                      </SelectItem>
+                      <SelectItem value="orders" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Online Orders & Delivery
+                      </SelectItem>
+                      <SelectItem value="payment" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Payment & Promotions
+                      </SelectItem>
+                      <SelectItem value="events" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Events & Catering
+                      </SelectItem>
+                      <SelectItem value="customer-service" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Customer Service
+                      </SelectItem>
+                      <SelectItem value="technical" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Website & Technical Support
+                      </SelectItem>
+                      <SelectItem value="careers" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Careers & Partnerships
+                      </SelectItem>
+                      <SelectItem value="others" className="text-yellow-100 focus:bg-orange-600/30 focus:text-yellow-100">
+                        Others
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
@@ -303,25 +372,22 @@ export default function Contact() {
 
         <Card className="mt-12 bg-black/50 backdrop-blur-sm border-orange-600/50 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-xl text-yellow-300">Find Us</CardTitle>
+            <CardTitle className="text-xl text-yellow-300 text-center">Find Us</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-hidden rounded-lg border border-orange-600/50">
               <iframe
-                title="Izakaya Tori Ichizu Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3861.4945420033205!2d120.98460257510561!3d14.57087308591194!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cb2a0466cd07%3A0x7b71aa67a7ff8369!2zSXpha3lhIFRvcmkgSWNoaXp1!5e0!3m2!1sen!2sph!4v1759719446311!5m2!1sen!2sph"
-                width="100%"
-                height="450"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3861.645583101857!2d121.02661837681514!3d14.562248885919582!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c9004b934477%3A0x94f3274e9f6fd6c!2sIzakaya%20Tori-Ichizu!5e0!3m2!1sen!2sph!4v1761286308658!5m2!1sen!2sph"
+                width="1455"
+                height="550"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
-              <p className="text-xs text-center text-yellow-200/60 mt-2">Google Maps integration is embedded below.</p>
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
-}
+  )};
